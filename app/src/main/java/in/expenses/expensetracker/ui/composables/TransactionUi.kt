@@ -1,0 +1,36 @@
+package `in`.expenses.expensetracker.ui.composables
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
+import `in`.expenses.expensetracker.R
+import `in`.expenses.expensetracker.model.Transaction
+import `in`.expenses.expensetracker.utils.HorizontalSpacer
+import `in`.expenses.expensetracker.utils.VerticalSpacer
+
+@Composable
+fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(text = stringResource(id = R.string.amount, transaction.amount), fontSize = 16.sp, color = Color.Black)
+            VerticalSpacer(height = 2)
+            Text(text = transaction.spendOn, fontSize = 12.sp, color = Color.DarkGray)
+        }
+
+        HorizontalSpacer(modifier = Modifier.weight(1f))
+
+        Text(text = transaction.date, fontSize = 12.sp, color = Color.DarkGray)
+
+    }
+}
