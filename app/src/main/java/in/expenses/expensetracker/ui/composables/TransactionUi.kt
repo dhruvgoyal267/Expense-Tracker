@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
@@ -23,14 +23,26 @@ fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = stringResource(id = R.string.amount, transaction.amount), fontSize = 16.sp, color = Color.Black)
+            Text(
+                text = stringResource(id = R.string.amount, transaction.amount),
+                fontSize = 16.sp,
+                color = colorResource(id = R.color.title)
+            )
             VerticalSpacer(height = 2)
-            Text(text = transaction.spendOn, fontSize = 12.sp, color = Color.DarkGray)
+            Text(
+                text = transaction.spendOn,
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.sub_title)
+            )
         }
 
         HorizontalSpacer(modifier = Modifier.weight(1f))
 
-        Text(text = transaction.date, fontSize = 12.sp, color = Color.DarkGray)
+        Text(
+            text = transaction.date,
+            fontSize = 12.sp,
+            color = colorResource(id = R.color.sub_title)
+        )
 
     }
 }

@@ -9,9 +9,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.utils.HorizontalSpacer
 
@@ -24,14 +27,17 @@ fun TitleUi() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(24.dp),
             painter = painterResource(id = R.drawable.icon_app_logo),
             contentDescription = "App logo"
         )
         HorizontalSpacer()
         Text(
             modifier = Modifier.weight(1f),
-            text = stringResource(id = R.string.app_name).lowercase()
+            text = stringResource(id = R.string.app_name).lowercase(),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Black,
+            color = colorResource(id = R.color.title)
         )
     }
 }
