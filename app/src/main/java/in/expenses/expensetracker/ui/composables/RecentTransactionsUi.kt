@@ -46,9 +46,10 @@ fun RecentTransactionUi(
             modifier = Modifier.fillMaxWidth(),
             text = "Recent Transaction",
             fontSize = 18.sp,
+            color = colorResource(id = R.color.title),
             fontWeight = FontWeight.Bold
         )
-        VerticalSpacer(height = 8)
+        VerticalSpacer()
         LazyColumn {
             items(transactions) { transaction ->
                 Column {

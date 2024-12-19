@@ -15,7 +15,6 @@ import `in`.expenses.expensetracker.model.AppState
 import `in`.expenses.expensetracker.ui.MainViewModel
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreenUi(viewModel: MainViewModel) {
     Column(
@@ -33,7 +32,7 @@ fun HomeScreenUi(viewModel: MainViewModel) {
                 AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(
                     description = viewModel.getNoTransactionFoundDescription(),
                     btnAddAction = {
-                        viewModel.addTransaction()
+                        viewModel.addCustomTransaction()
                     }) {
                     viewModel.allowSMSPermission()
                 }
