@@ -22,7 +22,7 @@ import `in`.expenses.expensetracker.utils.HorizontalSpacer
 fun TitleUi() {
     Row(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(vertical = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {

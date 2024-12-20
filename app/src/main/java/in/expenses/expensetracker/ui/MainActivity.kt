@@ -2,7 +2,9 @@ package `in`.expenses.expensetracker.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,11 +15,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import dagger.hilt.android.AndroidEntryPoint
 import `in`.expenses.expensetracker.ui.composables.AddCustomTransactionBottomSheet
 import `in`.expenses.expensetracker.ui.composables.HomeScreenUi
 import `in`.expenses.expensetracker.ui.composables.SMSPermissionBottomSheetUI
 import `in`.expenses.expensetracker.ui.theme.ExpenseTrackerTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
 
@@ -31,14 +36,29 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val context = LocalContext.current
                     LaunchedEffect(key1 = null) {
-                        viewModel.checkForSmsPermission()
+                        viewModel.checkForSmsPermission(context)
                     }
+
+                    val permissionLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = {
+                            viewModel.receivedSMSPermission(it)
+                        }
+                    )
 
                     val showSmsBottomSheet by viewModel.showSmsPermission.observeAsState(false)
                     val showAddTransactionBottomSheet by viewModel.showCustomTransaction.observeAsState(
                         false
                     )
+                    val askForPermission by viewModel.requestSmsPermission.observeAsState(initial = false)
+
+                    LaunchedEffect(key1 = askForPermission){
+                        if(askForPermission){
+                            permissionLauncher.launch(viewModel.getRequiredPermissions())
+                        }
+                    }
 
                     HomeScreenUi(viewModel)
 
@@ -52,7 +72,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    SMSPermissionBottomSheetUI(viewModel, smsPermissionState)
+                    if(showSmsBottomSheet) {
+                        SMSPermissionBottomSheetUI(viewModel, smsPermissionState)
+                    }
 
                     val customTransactionState =
                         rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -64,7 +86,10 @@ class MainActivity : ComponentActivity() {
                             customTransactionState.hide()
                         }
                     }
-                    AddCustomTransactionBottomSheet(viewModel, customTransactionState)
+
+                    if(showAddTransactionBottomSheet) {
+                        AddCustomTransactionBottomSheet(viewModel, customTransactionState)
+                    }
                 }
             }
         }

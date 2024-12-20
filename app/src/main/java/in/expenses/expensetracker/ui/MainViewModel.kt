@@ -1,63 +1,121 @@
 package `in`.expenses.expensetracker.ui
 
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import `in`.expenses.expensetracker.model.AppState
 import `in`.expenses.expensetracker.model.Transaction
+import `in`.expenses.expensetracker.usecases.AddTransactionUseCase
+import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCase
+import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
+import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
+import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
+import `in`.expenses.expensetracker.utils.DispatcherProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+    private val addTransactionUseCase: AddTransactionUseCase,
+    private val updateTransactionUseCase: UpdateTransactionUseCase,
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val getAllTransactionUseCase: GetAllTransactionUseCase,
+    private val getNTransactionUseCase: GetNTransactionUseCase
+) : ViewModel() {
 
     private val _showSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
     val showSmsPermission: LiveData<Boolean> = _showSmsPermission
 
+    private val _requestSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
+    val requestSmsPermission: LiveData<Boolean> = _requestSmsPermission
+
     private val _showCustomTransaction: MutableLiveData<Boolean> = MutableLiveData(false)
     val showCustomTransaction: LiveData<Boolean> = _showCustomTransaction
 
-    fun getCurrentState(): AppState {
-        return AppState.TRANSACTION_FOUND
-    }
+    private val _appState: MutableLiveData<AppState> = MutableLiveData(AppState.LOADING)
+    val appState: LiveData<AppState> = _appState
 
-    fun dismissTransactionBottomSheet(){
-        _showCustomTransaction.value = false
-    }
+    private val _recentTransactions: MutableLiveData<List<Transaction>> = MutableLiveData()
+    val recentTransaction: LiveData<List<Transaction>> = _recentTransactions
 
-    fun addTransaction(amount:String, spendOn: String) {
-        _showCustomTransaction.value = false
-    }
+    private val requiredPermissions = arrayOf(
+        android.Manifest.permission.READ_SMS,
+        android.Manifest.permission.RECEIVE_SMS
+    )
 
-    fun allowSMSPermission(){
+    fun getRequiredPermissions(): Array<String> = requiredPermissions
 
-    }
-
-    fun denySMSPermission(){
-        _showSmsPermission.value = false
-    }
-
-    fun checkForSmsPermission(){
+    fun getCurrentState() {
         viewModelScope.launch {
-            delay(1000)
-            _showSmsPermission.postValue(true)
+            getNTransactionUseCase().let { transactions ->
+                val appState = if (transactions.isEmpty()) {
+                    AppState.NO_TRANSACTION_FOUND
+                } else {
+                    _recentTransactions.postValue(transactions)
+                    AppState.TRANSACTION_FOUND
+                }
+
+                println("Dhruv: Posting: $appState")
+                _appState.postValue(appState)
+            }
         }
     }
 
-    fun addCustomTransaction(){
+    fun dismissTransactionBottomSheet() {
+        _showCustomTransaction.value = false
+    }
+
+    fun addTransaction(amount: String, spendOn: String) {
+        _showCustomTransaction.value = false
+        viewModelScope.launch {
+            addTransactionUseCase(Transaction(amount, spendOn))
+        }
+    }
+
+    fun receivedSMSPermission(result: Map<String, Boolean>) {
+        println("Dhruv: $result")
+    }
+
+    fun denySMSPermission() {
+        _showSmsPermission.value = false
+    }
+
+    fun checkForSmsPermission(context: Context) {
+        viewModelScope.launch(dispatcherProvider.default) {
+            val hasPermission = hasSmsPermission(context)
+            if (hasPermission.not()) {
+                delay(1000)
+                _showSmsPermission.postValue(true)
+            }
+        }
+    }
+
+    private fun hasSmsPermission(context: Context): Boolean {
+        return requiredPermissions.all {
+            ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_SMS
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    fun askForSmsPermission() {
+        _showSmsPermission.value = false
+        _requestSmsPermission.value = true
+    }
+
+    fun addCustomTransaction() {
         _showCustomTransaction.value = true
-    }
-
-    fun getNoTransactionFoundDescription(): String {
-        return "Allow SMS permission, so that we can record transaction automatically"
-    }
-
-    fun getRecentTransaction(): List<Transaction> {
-        return listOf(
-            Transaction("1781", "Life Insurance", "21/12/2024"),
-            Transaction("7812", "HDFC Credit card emi", "22/12/2024"),
-            Transaction("200", "Saloon", "23/12/2024")
-        )
     }
 
     fun viewMoreTransactionClicked() {}

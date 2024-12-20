@@ -1,12 +1,17 @@
 package `in`.expenses.expensetracker.ui.composables
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -27,15 +32,23 @@ fun HomeScreenUi(viewModel: MainViewModel) {
 
         VerticalSpacer(height = 16)
 
-        AnimatedContent(targetState = viewModel.getCurrentState(), label = "") { state ->
+        val appState by viewModel.appState.observeAsState(AppState.LOADING)
+
+        LaunchedEffect(key1 = null) {
+            viewModel.getCurrentState()
+        }
+
+        println("Dhruv: $appState")
+
+        AnimatedContent(targetState = appState, label = "") { state ->
             when (state) {
-                AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(
-                    description = viewModel.getNoTransactionFoundDescription(),
-                    btnAddAction = {
-                        viewModel.addCustomTransaction()
-                    }) {
-                    viewModel.allowSMSPermission()
+                AppState.LOADING -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
                 }
+
+                AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(viewModel = viewModel)
 
                 AppState.TRANSACTION_FOUND -> TransactionLayoutUi(viewModel = viewModel)
             }
