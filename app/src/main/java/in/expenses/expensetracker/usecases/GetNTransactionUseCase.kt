@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface GetNTransactionUseCase {
-    suspend operator fun invoke(): List<Transaction>
+    suspend operator fun invoke(): Flow<List<Transaction>>
 }
 
 class GetNTransactionUseCaseImpl @Inject constructor(
     private val transactionRepo: TransactionRepo
-) : GetNTransactionUseCase {
-    override suspend fun invoke(): List<Transaction> = transactionRepo.getLastNTransaction(5)
+): GetNTransactionUseCase {
+    override suspend fun invoke(): Flow<List<Transaction>> = transactionRepo.getLastNTransaction(5)
 }

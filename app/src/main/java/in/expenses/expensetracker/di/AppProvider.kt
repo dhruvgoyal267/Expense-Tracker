@@ -5,15 +5,17 @@ import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import `in`.expenses.expensetracker.db.AppDb
 import `in`.expenses.expensetracker.db.TransactionDao
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 object AppProvider {
     @Provides
+    @Singleton
     fun provideAppDb(@ApplicationContext applicationContext: Context): AppDb {
         return Room.databaseBuilder(
             applicationContext,
@@ -22,6 +24,7 @@ object AppProvider {
     }
 
     @Provides
+    @Singleton
     fun provideTransactionDao(appDb: AppDb): TransactionDao{
         return appDb.transactionDao()
     }

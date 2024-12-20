@@ -16,11 +16,8 @@ import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
 import `in`.expenses.expensetracker.utils.DispatcherProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,15 +54,13 @@ class MainViewModel @Inject constructor(
 
     fun getCurrentState() {
         viewModelScope.launch {
-            getNTransactionUseCase().let { transactions ->
+            getNTransactionUseCase().collect { transactions ->
                 val appState = if (transactions.isEmpty()) {
                     AppState.NO_TRANSACTION_FOUND
                 } else {
                     _recentTransactions.postValue(transactions)
                     AppState.TRANSACTION_FOUND
                 }
-
-                println("Dhruv: Posting: $appState")
                 _appState.postValue(appState)
             }
         }
@@ -83,7 +78,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun receivedSMSPermission(result: Map<String, Boolean>) {
-        println("Dhruv: $result")
     }
 
     fun denySMSPermission() {

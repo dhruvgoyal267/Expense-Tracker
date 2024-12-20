@@ -38,8 +38,6 @@ fun HomeScreenUi(viewModel: MainViewModel) {
             viewModel.getCurrentState()
         }
 
-        println("Dhruv: $appState")
-
         AnimatedContent(targetState = appState, label = "") { state ->
             when (state) {
                 AppState.LOADING -> {

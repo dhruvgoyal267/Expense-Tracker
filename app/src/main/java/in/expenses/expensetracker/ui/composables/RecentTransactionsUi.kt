@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,16 +27,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
-import `in`.expenses.expensetracker.model.Transaction
+import `in`.expenses.expensetracker.ui.MainViewModel
 import `in`.expenses.expensetracker.utils.HorizontalSpacer
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
 @Composable
 fun RecentTransactionUi(
     modifier: Modifier = Modifier,
-    transactions: List<Transaction>,
-    onViewAllClick: () -> Unit
+    viewModel: MainViewModel
 ) {
+    val transactions by viewModel.recentTransaction.observeAsState(emptyList())
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -70,7 +73,6 @@ fun RecentTransactionUi(
 
         Row(modifier = Modifier
             .clickable {
-                onViewAllClick()
             }, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "ViEW MORE", fontSize = 12.sp, color = colorResource(id = R.color.tint))

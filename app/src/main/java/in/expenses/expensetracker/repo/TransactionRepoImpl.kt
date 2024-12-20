@@ -7,9 +7,7 @@ import `in`.expenses.expensetracker.model.toObj
 import `in`.expenses.expensetracker.utils.DispatcherProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -18,21 +16,15 @@ class TransactionRepoImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : TransactionRepo {
     override suspend fun addTransaction(transaction: Transaction) {
-        withContext(dispatcherProvider.io) {
-            transactionDao.addTransaction(transaction.toEntity())
-        }
+        transactionDao.addTransaction(transaction.toEntity())
     }
 
     override suspend fun updateTransaction(transaction: Transaction) {
-        withContext(dispatcherProvider.io) {
-            transactionDao.updateTransaction(transaction.toEntity())
-        }
+        transactionDao.updateTransaction(transaction.toEntity())
     }
 
     override suspend fun deleteTransaction(transaction: Transaction) {
-        withContext(dispatcherProvider.io) {
-            transactionDao.deleteTransaction(transaction.toEntity())
-        }
+        transactionDao.deleteTransaction(transaction.toEntity())
     }
 
     override suspend fun getAllTransaction(): Flow<List<Transaction>> {
@@ -47,18 +39,13 @@ class TransactionRepoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastNTransaction(count: Int): List<Transaction> {
-        return withContext(dispatcherProvider.io) {
-            transactionDao.getLastNTransaction(count).map {
-                it.toObj()
+    override suspend fun getLastNTransaction(count: Int): Flow<List<Transaction>> {
+        return flow {
+            transactionDao.getLastNTransactionFlow(count).collect { list ->
+                emit(list.map { entity ->
+                    entity.toObj()
+                })
             }
-//            flow {
-//                transactionDao.getLastNTransaction(count).onEach { list ->
-//                    emit(list.map { entity ->
-//                        entity.toObj()
-//                    })
-//                }
-//            }
         }
     }
 }

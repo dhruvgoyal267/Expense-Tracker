@@ -8,5 +8,5 @@ interface TransactionRepo {
     suspend fun updateTransaction(transaction: Transaction)
     suspend fun deleteTransaction(transaction: Transaction)
     suspend fun getAllTransaction(): Flow<List<Transaction>>
-    suspend fun getLastNTransaction(count: Int): List<Transaction>
+    suspend fun getLastNTransaction(count: Int): Flow<List<Transaction>>
 }

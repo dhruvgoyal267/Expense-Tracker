@@ -18,6 +18,6 @@ interface TransactionDao {
     suspend fun updateTransaction(transaction: TransactionEntity)
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)
-    @Query("Select * from TransactionEntity limit :count")
-    suspend fun getLastNTransaction(count: Int): List<TransactionEntity>
+    @Query("Select * from TransactionEntity order by id desc limit :count")
+    fun getLastNTransactionFlow(count: Int): Flow<List<TransactionEntity>>
 }
