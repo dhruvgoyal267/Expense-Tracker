@@ -13,9 +13,12 @@ import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.usecases.AddTransactionUseCase
 import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
+import `in`.expenses.expensetracker.usecases.GetCurrentMonthExpensesUseCase
+import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
 import `in`.expenses.expensetracker.utils.DispatcherProvider
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +30,9 @@ class MainViewModel @Inject constructor(
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val getAllTransactionUseCase: GetAllTransactionUseCase,
-    private val getNTransactionUseCase: GetNTransactionUseCase
+    private val getNTransactionUseCase: GetNTransactionUseCase,
+    private val getCurrentMonthExpensesUseCase: GetCurrentMonthExpensesUseCase,
+    private val getLastMonthExpensesUseCase: GetLastMonthExpensesUseCase
 ) : ViewModel() {
 
     private val _showSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -44,6 +49,17 @@ class MainViewModel @Inject constructor(
 
     private val _recentTransactions: MutableLiveData<List<Transaction>> = MutableLiveData()
     val recentTransaction: LiveData<List<Transaction>> = _recentTransactions
+
+    private val _allTransactions: MutableLiveData<List<Transaction>> = MutableLiveData()
+    val allTransaction: LiveData<List<Transaction>> = _allTransactions
+
+    private val _currentMonthExpense: MutableLiveData<String> = MutableLiveData()
+    val currentMonthExpense: LiveData<String> = _currentMonthExpense
+
+    private val _lastMonthExpense: MutableLiveData<String> = MutableLiveData()
+    val lastMonthExpense: LiveData<String> = _lastMonthExpense
+
+    private var allTransactionJob: Job? = null
 
     private val requiredPermissions = arrayOf(
         android.Manifest.permission.READ_SMS,
@@ -73,7 +89,7 @@ class MainViewModel @Inject constructor(
     fun addTransaction(amount: String, spendOn: String) {
         _showCustomTransaction.value = false
         viewModelScope.launch {
-            addTransactionUseCase(Transaction(amount, spendOn))
+            addTransactionUseCase(amount, spendOn)
         }
     }
 
@@ -112,14 +128,25 @@ class MainViewModel @Inject constructor(
         _showCustomTransaction.value = true
     }
 
-    fun viewMoreTransactionClicked() {}
-
-    fun getCurrentMonthExpenses(): String {
-        return "127231"
+    fun viewMoreTransactionClicked() {
+        _appState.value = AppState.VIEW_ALL_TRANSACTION
+        allTransactionJob = viewModelScope.launch {
+            getAllTransactionUseCase().collect {
+                _allTransactions.postValue(it)
+            }
+        }
     }
 
-    fun getLastMonthExpenses(): String {
-        return "117231"
-    }
 
+    fun loadExpenses() {
+        viewModelScope.launch {
+            getCurrentMonthExpensesUseCase().collect {
+                _currentMonthExpense.postValue(it)
+            }
+
+            getLastMonthExpensesUseCase().collect {
+                _lastMonthExpense.postValue(it)
+            }
+        }
+    }
 }

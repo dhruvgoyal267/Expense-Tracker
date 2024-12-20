@@ -49,6 +49,8 @@ fun HomeScreenUi(viewModel: MainViewModel) {
                 AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(viewModel = viewModel)
 
                 AppState.TRANSACTION_FOUND -> TransactionLayoutUi(viewModel = viewModel)
+
+                AppState.VIEW_ALL_TRANSACTION -> ViewAllTransactionsUI(viewModel = viewModel)
             }
         }
     }

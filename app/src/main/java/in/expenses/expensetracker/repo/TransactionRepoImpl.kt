@@ -1,6 +1,7 @@
 package `in`.expenses.expensetracker.repo
 
 import `in`.expenses.expensetracker.db.TransactionDao
+import `in`.expenses.expensetracker.db.TransactionEntity
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.toEntity
 import `in`.expenses.expensetracker.model.toObj
@@ -15,8 +16,10 @@ class TransactionRepoImpl @Inject constructor(
     private val transactionDao: TransactionDao,
     private val dispatcherProvider: DispatcherProvider
 ) : TransactionRepo {
-    override suspend fun addTransaction(transaction: Transaction) {
-        transactionDao.addTransaction(transaction.toEntity())
+    override suspend fun addTransaction(amount: String, spendOn: String) {
+        transactionDao.addTransaction(
+            TransactionEntity(amount= amount.toDouble(), spendOn = spendOn)
+        )
     }
 
     override suspend fun updateTransaction(transaction: Transaction) {
@@ -30,7 +33,7 @@ class TransactionRepoImpl @Inject constructor(
     override suspend fun getAllTransaction(): Flow<List<Transaction>> {
         return withContext(dispatcherProvider.io) {
             flow {
-                transactionDao.getAllTransaction().onEach { list ->
+                transactionDao.getAllTransaction().collect { list ->
                     emit(list.map { entity ->
                         entity.toObj()
                     })
@@ -47,5 +50,9 @@ class TransactionRepoImpl @Inject constructor(
                 })
             }
         }
+    }
+
+    override suspend fun getTotalExpenses(startTimeStamp: Long, endTimeStamp: Long): Flow<Double> {
+        return transactionDao.getTotalExpense(startTimeStamp, endTimeStamp)
     }
 }

@@ -71,9 +71,11 @@ fun RecentTransactionUi(
         }
         VerticalSpacer(height = 12)
 
-        Row(modifier = Modifier
-            .clickable {
-            }, verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier
+                .clickable {
+                    viewModel.viewMoreTransactionClicked()
+                }, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "ViEW MORE", fontSize = 12.sp, color = colorResource(id = R.color.tint))
             HorizontalSpacer(width = 2)

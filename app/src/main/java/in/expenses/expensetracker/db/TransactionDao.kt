@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
-    @Query("Select * from TransactionEntity")
+    @Query("Select * from TransactionEntity order by id desc")
     fun getAllTransaction(): Flow<List<TransactionEntity>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTransaction(transaction: TransactionEntity)
@@ -20,4 +20,6 @@ interface TransactionDao {
     suspend fun deleteTransaction(transaction: TransactionEntity)
     @Query("Select * from TransactionEntity order by id desc limit :count")
     fun getLastNTransactionFlow(count: Int): Flow<List<TransactionEntity>>
+    @Query("Select SUM(amount) from TransactionEntity where timeStamp >= :start and timeStamp<= :end")
+    fun getTotalExpense(start: Long, end: Long): Flow<Double>
 }
