@@ -13,7 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
+import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.ui.MainViewModel
 import `in`.expenses.expensetracker.utils.HorizontalSpacer
 import `in`.expenses.expensetracker.utils.VerticalSpacer
@@ -34,7 +35,8 @@ import `in`.expenses.expensetracker.utils.VerticalSpacer
 @Composable
 fun RecentTransactionUi(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    onViewMore: (transactionSelector: TransactionSelector) -> Unit
 ) {
     val transactions by viewModel.recentTransaction.observeAsState(emptyList())
 
@@ -74,14 +76,14 @@ fun RecentTransactionUi(
         Row(
             modifier = Modifier
                 .clickable {
-                    viewModel.viewMoreTransactionClicked()
+                    onViewMore(TransactionSelector.ALL_TRANSACTION)
                 }, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "ViEW MORE", fontSize = 12.sp, color = colorResource(id = R.color.tint))
             HorizontalSpacer(width = 2)
             Icon(
                 modifier = Modifier.size(16.dp),
-                imageVector = Icons.Default.KeyboardArrowRight,
+                imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
                 contentDescription = "View More",
                 tint = colorResource(id = R.color.tint)
             )

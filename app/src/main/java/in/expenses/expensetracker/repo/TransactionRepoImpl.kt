@@ -5,20 +5,17 @@ import `in`.expenses.expensetracker.db.TransactionEntity
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.toEntity
 import `in`.expenses.expensetracker.model.toObj
-import `in`.expenses.expensetracker.utils.DispatcherProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TransactionRepoImpl @Inject constructor(
-    private val transactionDao: TransactionDao,
-    private val dispatcherProvider: DispatcherProvider
+    private val transactionDao: TransactionDao
 ) : TransactionRepo {
     override suspend fun addTransaction(amount: String, spendOn: String) {
         transactionDao.addTransaction(
-            TransactionEntity(amount= amount.toDouble(), spendOn = spendOn)
+            TransactionEntity(amount = amount.toDouble(), spendOn = spendOn)
         )
     }
 
@@ -31,13 +28,24 @@ class TransactionRepoImpl @Inject constructor(
     }
 
     override suspend fun getAllTransaction(): Flow<List<Transaction>> {
-        return withContext(dispatcherProvider.io) {
-            flow {
-                transactionDao.getAllTransaction().collect { list ->
-                    emit(list.map { entity ->
-                        entity.toObj()
-                    })
-                }
+        return flow {
+            transactionDao.getAllTransaction().collect { list ->
+                emit(list.map { entity ->
+                    entity.toObj()
+                })
+            }
+        }
+    }
+
+    override suspend fun getCustomTransaction(
+        startTimeStamp: Long,
+        endTimeStamp: Long
+    ): Flow<List<Transaction>> {
+        return flow {
+            transactionDao.getCustomTransaction(startTimeStamp, endTimeStamp).collect { list ->
+                emit(list.map { entity ->
+                    entity.toObj()
+                })
             }
         }
     }

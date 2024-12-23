@@ -1,10 +1,15 @@
 package `in`.expenses.expensetracker.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,13 +24,28 @@ import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.utils.HorizontalSpacer
 
 @Composable
-fun TitleUi() {
+fun TitleUi(
+    modifier: Modifier = Modifier,
+    isBackEnabled: Boolean = false,
+    onBackClicked: () -> Unit = {}
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (isBackEnabled) {
+            Icon(
+                modifier = Modifier.clickable {
+                    onBackClicked()
+                },
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                contentDescription = "Back button"
+            )
+            HorizontalSpacer()
+        }
+
         Image(
             modifier = Modifier.size(24.dp),
             painter = painterResource(id = R.drawable.icon_app_logo),

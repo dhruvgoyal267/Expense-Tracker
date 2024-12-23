@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import `in`.expenses.expensetracker.model.AppState
 import `in`.expenses.expensetracker.model.Transaction
+import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.usecases.AddTransactionUseCase
 import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
@@ -46,6 +47,9 @@ class MainViewModel @Inject constructor(
 
     private val _appState: MutableLiveData<AppState> = MutableLiveData(AppState.LOADING)
     val appState: LiveData<AppState> = _appState
+
+    private val _viewAllTransactionState: MutableLiveData<AppState> = MutableLiveData(AppState.LOADING)
+    val viewAllTransactionState: LiveData<AppState> = _viewAllTransactionState
 
     private val _recentTransactions: MutableLiveData<List<Transaction>> = MutableLiveData()
     val recentTransaction: LiveData<List<Transaction>> = _recentTransactions
@@ -128,13 +132,22 @@ class MainViewModel @Inject constructor(
         _showCustomTransaction.value = true
     }
 
-    fun viewMoreTransactionClicked() {
-        _appState.value = AppState.VIEW_ALL_TRANSACTION
+    fun loadPreDefinedCustomTransaction(transactionSelector: TransactionSelector) {
+        allTransactionJob?.cancel()
+        _viewAllTransactionState.postValue(AppState.LOADING)
         allTransactionJob = viewModelScope.launch {
-            getAllTransactionUseCase().collect {
+            getAllTransactionUseCase(transactionSelector).collect {
+                val state = if(it.isEmpty()) AppState.NO_TRANSACTION_FOUND else AppState.TRANSACTION_FOUND
+                _viewAllTransactionState.postValue(state)
                 _allTransactions.postValue(it)
             }
         }
+    }
+
+
+    fun stopListeningAllTransaction(){
+        allTransactionJob?.cancel()
+        allTransactionJob = null
     }
 
 
