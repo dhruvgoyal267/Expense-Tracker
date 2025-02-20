@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +37,7 @@ fun SMSPermissionBottomSheetUI(viewModel: MainViewModel, sheetState: SheetState)
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Allow us to take the SMS permission",
+                text = stringResource(R.string.allow_us_to_take_the_sms_permission),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(id = R.color.title)
@@ -45,18 +46,26 @@ fun SMSPermissionBottomSheetUI(viewModel: MainViewModel, sheetState: SheetState)
             VerticalSpacer()
 
             Text(
-                text = "We will not use your sms anywhere, it will be just to detect a transaction, so that it can be logged automatically",
+                text = stringResource(
+                    R.string.sms_permission_desc
+                ),
                 fontSize = 12.sp,
                 color = colorResource(id = R.color.sub_title)
             )
 
             VerticalSpacer(height = 24)
 
-            CustomSecondaryButton(Modifier.fillMaxWidth(), text = "Deny Permission"){
+            CustomSecondaryButton(
+                Modifier.fillMaxWidth(),
+                text = stringResource(R.string.deny_permission)
+            ) {
                 viewModel.denySMSPermission()
             }
 
-            CustomPrimaryButton(modifier = Modifier.fillMaxWidth(), text = "Allow permission"){
+            CustomPrimaryButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.allow_permission)
+            ) {
                 viewModel.askForSmsPermission()
             }
         }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -29,7 +30,7 @@ fun NoTransactionUI(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "No transaction found",
+            text = stringResource(R.string.no_transaction_found),
             fontWeight = FontWeight.W500,
             fontSize = 16.sp,
             color = colorResource(
@@ -52,7 +53,7 @@ fun NoTransactionUI(
 
         CustomPrimaryButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Add transaction"
+            text = stringResource(id = R.string.add_transaction)
         ) {
             viewModel.addCustomTransaction()
         }

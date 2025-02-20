@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,19 +51,20 @@ fun RecentTransactionUi(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Recent Transaction",
+            text = stringResource(R.string.recent_transaction),
             fontSize = 18.sp,
             color = colorResource(id = R.color.title),
             fontWeight = FontWeight.Bold
         )
         VerticalSpacer()
-        LazyColumn {
+        val maxHeight = (transactions.size * 80).dp
+        LazyColumn(modifier = Modifier.heightIn(0.dp, maxHeight)) {
             items(transactions) { transaction ->
                 Column {
                     TransactionUi(
                         modifier = Modifier.padding(vertical = 8.dp),
                         transaction = transaction
-                    ){}
+                    ) {}
                     Spacer(
                         modifier = Modifier
                             .height(1.dp)
@@ -79,12 +82,16 @@ fun RecentTransactionUi(
                     onViewMore(TransactionSelector.TransactionSelectorEnum.ALL_TRANSACTION)
                 }, verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "ViEW MORE", fontSize = 12.sp, color = colorResource(id = R.color.tint))
+            Text(
+                text = stringResource(R.string.view_more),
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.tint)
+            )
             HorizontalSpacer(width = 2)
             Icon(
                 modifier = Modifier.size(16.dp),
                 imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                contentDescription = "View More",
+                contentDescription = stringResource(R.string.view_more),
                 tint = colorResource(id = R.color.tint)
             )
         }

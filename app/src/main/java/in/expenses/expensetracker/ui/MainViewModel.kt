@@ -1,7 +1,9 @@
 package `in`.expenses.expensetracker.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -68,6 +70,9 @@ class MainViewModel @Inject constructor(
     private val _lastMonthExpense: MutableLiveData<Double> = MutableLiveData()
     val lastMonthExpense: LiveData<Double> = _lastMonthExpense
 
+    private val _shouldShowAskSmsPermissionNudge: MutableLiveData<Boolean> = MutableLiveData(false)
+    val shouldShowAskSmsPermissionNudge: LiveData<Boolean> = _shouldShowAskSmsPermissionNudge
+
     private var allTransactionJob: Job? = null
 
     var preFetchedAmount: String = ""
@@ -106,7 +111,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onReceivedSMSPermission(result: Map<String, Boolean>) {
-
+        _shouldShowAskSmsPermissionNudge.postValue(result.none { it.value })
     }
 
     fun denySMSPermission() {
@@ -119,9 +124,28 @@ class MainViewModel @Inject constructor(
             val canAskPermission = canAskPermissionUseCase()
             if (hasPermission.not() && canAskPermission) {
                 delay(1000)
+                _shouldShowAskSmsPermissionNudge.postValue(false)
                 _showSmsPermission.postValue(true)
+                onPermissionAskedUseCase()
+            } else if (canAskPermission.not()) {
+                _shouldShowAskSmsPermissionNudge.postValue(
+                    shouldShowRequestPermissionRationale(
+                        context
+                    )
+                )
             }
         }
+    }
+
+    private fun shouldShowRequestPermissionRationale(context: Context): Boolean {
+        return (context as? Activity)?.let { activity ->
+            requiredPermissions.all {
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity,
+                    it
+                )
+            }
+        } ?: false
     }
 
     private fun hasSmsPermission(context: Context): Boolean {
@@ -134,9 +158,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun askForSmsPermission() {
-        viewModelScope.launch {
-            onPermissionAskedUseCase()
-        }
         _showSmsPermission.value = false
         _requestSmsPermission.value = true
     }
@@ -156,11 +177,6 @@ class MainViewModel @Inject constructor(
                 _allTransactions.postValue(it)
             }
         }
-    }
-
-    fun loadCustomTransaction(startMillis: Long, endMillis: Long) {
-        _viewAllTransactionState.postValue(AppState.LOADING)
-
     }
 
     fun stopListeningAllTransaction() {

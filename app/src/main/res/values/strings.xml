@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">Expense Tracker</string>
     <string name="amount">"₹%s"</string>
+    <string name="add_transaction">Add transaction</string>
+    <string name="add_your_custom_transaction_which_we_missed_to_record">Add your custom transaction\nwhich we missed to record</string>
+    <string name="add">Add</string>
+    <string name="no_transaction_found">No transaction found</string>
+    <string name="allow_us_to_take_the_sms_permission">Allow us to take the SMS permission</string>
+    <string name="sms_permission_desc">We will not use your sms anywhere, it will be just to detect a transaction, so that it can be logged automatically</string>
+    <string name="deny_permission">Deny Permission</string>
+    <string name="allow_permission">Allow permission</string>
+    <string name="allow">Allow</string>
+    <string name="current_month_expenses">Current month expenses</string>
+    <string name="last_month_expenses">Last month expenses</string>
+    <string name="recent_transaction">Recent Transaction</string>
+    <string name="view_more">ViEW MORE</string>
 </resources>

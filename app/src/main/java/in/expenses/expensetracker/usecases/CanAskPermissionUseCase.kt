@@ -12,7 +12,7 @@ class CanAskPermissionUseCaseImpl @Inject constructor(
 ) : CanAskPermissionUseCase {
 
     companion object {
-        private const val PERMISSION_ASK_THRESHOLD = 5
+        private const val PERMISSION_ASK_THRESHOLD = 3
     }
 
     override suspend fun invoke(): Boolean =

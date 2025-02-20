@@ -1,5 +1,6 @@
 package `in`.expenses.expensetracker.ui.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +17,12 @@ import `in`.expenses.expensetracker.utils.VerticalSpacer
 import `in`.expenses.expensetracker.utils.formatAmount
 
 @Composable
-fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction, onClick: ()-> Unit) {
+fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction, onClick: () -> Unit) {
     Row(
         modifier = modifier
+            .clickable {
+                onClick()
+            }
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {

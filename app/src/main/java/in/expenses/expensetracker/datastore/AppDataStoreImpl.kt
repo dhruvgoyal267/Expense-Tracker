@@ -16,9 +16,10 @@ class AppDataStoreImpl @Inject constructor(
 ) : AppDataStore {
     companion object {
         private const val KEY = "permissions"
+        private const val STORE_NAME = "app_data_store"
     }
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = KEY)
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
     private val permissionsKey by lazy {
         intPreferencesKey(KEY)
     }
