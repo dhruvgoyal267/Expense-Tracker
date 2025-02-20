@@ -2,6 +2,7 @@ package `in`.expenses.expensetracker.ui.composables
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -46,23 +47,49 @@ fun ViewAllTransactionsUI(
     selectedOption: TransactionSelector,
     onBackClicked: () -> Unit
 ) {
+    var dateRangePicker by remember {
+        mutableStateOf(false)
+    }
+    BackHandler {
+        onBackClicked()
+    }
+
+    AnimatedVisibility(visible = dateRangePicker) {
+        DateRangePickerUI { start, end ->
+            dateRangePicker = false
+            viewModel.loadPreDefinedCustomTransaction(TransactionSelector.Custom(start, end))
+        }
+    }
+
+    ViewAllTransactionUIComposable(
+        viewModel = viewModel,
+        selectedOption = selectedOption,
+        onBackClicked = onBackClicked
+    ) {
+        dateRangePicker = it
+    }
+}
+
+@Composable
+fun ViewAllTransactionUIComposable(
+    viewModel: MainViewModel,
+    selectedOption: TransactionSelector,
+    onBackClicked: () -> Unit,
+    showDatePicker: (show: Boolean) -> Unit
+) {
     val transactions by viewModel.allTransaction.observeAsState(emptyList())
-    val viewALlTransactionState by viewModel.viewAllTransactionState.observeAsState(AppState.LOADING)
+    val viewALlTransactionState by viewModel.viewAllTransactionState.observeAsState(AppState.DEFAULT)
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionValue by remember { mutableStateOf(selectedOption) }
     val options = remember {
-        TransactionSelector.values()
+        TransactionSelector.TransactionSelectorEnum.values()
     }
 
     LaunchedEffect(key1 = selectedOptionValue) {
         viewModel.loadPreDefinedCustomTransaction(selectedOptionValue)
     }
 
-    BackHandler {
-        onBackClicked()
-    }
-
-    Column(modifier = Modifier.background(colorResource(id = R.color.app_bg))) {
+    Column {
         TitleUi(
             modifier = Modifier.padding(start = 8.dp),
             isBackEnabled = true,
@@ -86,7 +113,7 @@ fun ViewAllTransactionsUI(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = selectedOptionValue.key,
+                    text = selectedOptionValue.key.key,
                     fontSize = 14.sp,
                     color = colorResource(id = R.color.title)
                 )
@@ -108,15 +135,16 @@ fun ViewAllTransactionsUI(
                         Text(
                             text = it.key,
                             fontSize = 12.sp,
-                            fontWeight = if (it == selectedOptionValue) FontWeight.W500 else FontWeight.W400,
+                            fontWeight = if (it == selectedOptionValue.key) FontWeight.W500 else FontWeight.W400,
                             color = colorResource(id = R.color.title)
                         )
                     }, onClick = {
-                        selectedOptionValue = it
+                        selectedOptionValue = TransactionSelector.getTransactionSelector(it.key)
                         expanded = false
-                        if (it == TransactionSelector.CUSTOM) {
-
+                        if (it == TransactionSelector.TransactionSelectorEnum.CUSTOM) {
+                            showDatePicker(true)
                         } else {
+                            showDatePicker(false)
                             viewModel.loadPreDefinedCustomTransaction(selectedOptionValue)
                         }
                     })
@@ -127,7 +155,8 @@ fun ViewAllTransactionsUI(
         VerticalSpacer()
 
         AnimatedContent(targetState = viewALlTransactionState, label = "Content") {
-            when(it) {
+            when (it) {
+                AppState.DEFAULT -> Unit
                 AppState.LOADING -> Loader()
                 AppState.NO_TRANSACTION_FOUND -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -141,6 +170,7 @@ fun ViewAllTransactionsUI(
                         )
                     }
                 }
+
                 AppState.TRANSACTION_FOUND -> {
                     LazyColumn(
                         modifier = Modifier
@@ -154,7 +184,8 @@ fun ViewAllTransactionsUI(
                                 TransactionUi(
                                     modifier = Modifier.padding(vertical = 8.dp),
                                     transaction = transaction
-                                )
+                                ) {
+                                }
                                 Spacer(
                                     modifier = Modifier
                                         .height(1.dp)

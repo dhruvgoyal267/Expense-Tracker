@@ -13,5 +13,6 @@
     <color name="separator_bg">#ECECEC</color>
     <color name="title">@color/black</color>
     <color name="sub_title">#FF444444</color>
+    <color name="disabled_text">#ACAAAA</color>
     <color name="tint">@color/blue_700</color>
 </resources>

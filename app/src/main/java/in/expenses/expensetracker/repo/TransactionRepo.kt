@@ -1,7 +1,6 @@
 package `in`.expenses.expensetracker.repo
 
 import `in`.expenses.expensetracker.model.Transaction
-import `in`.expenses.expensetracker.model.TransactionSelector
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepo {
@@ -12,4 +11,6 @@ interface TransactionRepo {
     suspend fun getCustomTransaction(startTimeStamp: Long, endTimeStamp: Long): Flow<List<Transaction>>
     suspend fun getLastNTransaction(count: Int): Flow<List<Transaction>>
     suspend fun getTotalExpenses(startTimeStamp: Long, endTimeStamp: Long): Flow<Double>
+    suspend fun permissionAsked()
+    suspend fun permissionAskedCount(): Int
 }

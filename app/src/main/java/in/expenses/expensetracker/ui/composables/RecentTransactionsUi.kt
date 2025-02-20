@@ -36,7 +36,7 @@ import `in`.expenses.expensetracker.utils.VerticalSpacer
 fun RecentTransactionUi(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel,
-    onViewMore: (transactionSelector: TransactionSelector) -> Unit
+    onViewMore: (transactionSelector: TransactionSelector.TransactionSelectorEnum) -> Unit
 ) {
     val transactions by viewModel.recentTransaction.observeAsState(emptyList())
 
@@ -61,7 +61,7 @@ fun RecentTransactionUi(
                     TransactionUi(
                         modifier = Modifier.padding(vertical = 8.dp),
                         transaction = transaction
-                    )
+                    ){}
                     Spacer(
                         modifier = Modifier
                             .height(1.dp)
@@ -76,7 +76,7 @@ fun RecentTransactionUi(
         Row(
             modifier = Modifier
                 .clickable {
-                    onViewMore(TransactionSelector.ALL_TRANSACTION)
+                    onViewMore(TransactionSelector.TransactionSelectorEnum.ALL_TRANSACTION)
                 }, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "ViEW MORE", fontSize = 12.sp, color = colorResource(id = R.color.tint))

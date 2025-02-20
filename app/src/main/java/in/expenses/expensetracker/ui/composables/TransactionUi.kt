@@ -8,15 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.utils.HorizontalSpacer
 import `in`.expenses.expensetracker.utils.VerticalSpacer
+import `in`.expenses.expensetracker.utils.formatAmount
 
 @Composable
-fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction) {
+fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction, onClick: ()-> Unit) {
     Row(
         modifier = modifier
             .fillMaxWidth(),
@@ -24,7 +24,7 @@ fun TransactionUi(modifier: Modifier = Modifier, transaction: Transaction) {
     ) {
         Column {
             Text(
-                text = stringResource(id = R.string.amount, transaction.amount),
+                text = formatAmount(transaction.amount),
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.title)
             )

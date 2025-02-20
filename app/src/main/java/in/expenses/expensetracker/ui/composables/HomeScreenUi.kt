@@ -3,27 +3,21 @@ package `in`.expenses.expensetracker.ui.composables
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.model.AppState
 import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.ui.MainViewModel
@@ -33,7 +27,7 @@ import `in`.expenses.expensetracker.utils.VerticalSpacer
 @Composable
 fun HomeScreenUi(
     viewModel: MainViewModel,
-    onViewMore: (transactionSelector: TransactionSelector) -> Unit
+    onViewMore: (transactionSelector: TransactionSelector.TransactionSelectorEnum) -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(key1 = null) {
@@ -43,7 +37,7 @@ fun HomeScreenUi(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = {
-            viewModel.receivedSMSPermission(it)
+            viewModel.onReceivedSMSPermission(it)
         }
     )
 
@@ -92,7 +86,6 @@ fun HomeScreenUi(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.app_bg))
             .padding(horizontal = 16.dp)
             .scrollable(scrollState, orientation = Orientation.Vertical),
     ) {
@@ -108,6 +101,8 @@ fun HomeScreenUi(
 
         AnimatedContent(targetState = appState, label = "") { state ->
             when (state) {
+                AppState.DEFAULT -> Unit
+
                 AppState.LOADING -> Loader()
 
                 AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(viewModel = viewModel)

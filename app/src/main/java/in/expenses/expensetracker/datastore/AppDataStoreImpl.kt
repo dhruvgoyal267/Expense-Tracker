@@ -1,0 +1,35 @@
+package `in`.expenses.expensetracker.datastore
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+
+class AppDataStoreImpl @Inject constructor(
+    @ApplicationContext private val appContext: Context
+) : AppDataStore {
+    companion object {
+        private const val KEY = "permissions"
+    }
+
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = KEY)
+    private val permissionsKey by lazy {
+        intPreferencesKey(KEY)
+    }
+
+    override suspend fun permissionAsked() {
+        appContext.dataStore.edit {
+            it[permissionsKey] = it[permissionsKey]?.plus(1) ?: 1
+        }
+    }
+
+    override suspend fun permissionAskedCount(): Int {
+        return appContext.dataStore.data.map { it[permissionsKey] }.firstOrNull() ?: 0
+    }
+}

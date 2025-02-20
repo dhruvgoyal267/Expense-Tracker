@@ -22,6 +22,6 @@ interface TransactionDao {
     suspend fun deleteTransaction(transaction: TransactionEntity)
     @Query("Select * from TransactionEntity order by id desc limit :count")
     fun getLastNTransactionFlow(count: Int): Flow<List<TransactionEntity>>
-    @Query("Select SUM(amount) from TransactionEntity where timeStamp BETWEEN :start and :end")
+    @Query("Select COALESCE(SUM(amount), 0) from TransactionEntity where timeStamp BETWEEN :start and :end")
     fun getTotalExpense(start: Long, end: Long): Flow<Double>
 }

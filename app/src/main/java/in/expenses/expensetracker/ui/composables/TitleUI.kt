@@ -41,7 +41,8 @@ fun TitleUi(
                     onBackClicked()
                 },
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = "Back button"
+                contentDescription = "Back button",
+                tint = colorResource(id = R.color.black)
             )
             HorizontalSpacer()
         }

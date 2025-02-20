@@ -59,3 +59,12 @@ fun getLastSixMonthTimeRange(): TimeRange {
 
     return TimeRange(monthStartTimeStamp, monthEndTimeStamp)
 }
+
+fun formatAmount(amount: Double): String {
+    return when {
+        amount >= 1_00_00_000 -> String.format("₹%.1fCr", amount / 1_00_00_000.0)
+        amount >= 1_00_000 -> String.format("₹%.1fL", amount / 1_00_000.0)
+        amount >= 1_000 -> String.format("₹%.1fK", amount / 1_000.0)
+        else -> "₹$amount"
+    }.replace(".0", "")
+}

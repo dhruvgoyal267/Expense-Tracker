@@ -12,11 +12,13 @@ import `in`.expenses.expensetracker.model.AppState
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.usecases.AddTransactionUseCase
+import `in`.expenses.expensetracker.usecases.CanAskPermissionUseCase
 import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetCurrentMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
+import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCase
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
 import `in`.expenses.expensetracker.utils.DispatcherProvider
 import kotlinx.coroutines.Job
@@ -33,7 +35,9 @@ class MainViewModel @Inject constructor(
     private val getAllTransactionUseCase: GetAllTransactionUseCase,
     private val getNTransactionUseCase: GetNTransactionUseCase,
     private val getCurrentMonthExpensesUseCase: GetCurrentMonthExpensesUseCase,
-    private val getLastMonthExpensesUseCase: GetLastMonthExpensesUseCase
+    private val getLastMonthExpensesUseCase: GetLastMonthExpensesUseCase,
+    private val onPermissionAskedUseCase: OnPermissionAskedUseCase,
+    private val canAskPermissionUseCase: CanAskPermissionUseCase
 ) : ViewModel() {
 
     private val _showSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -48,7 +52,8 @@ class MainViewModel @Inject constructor(
     private val _appState: MutableLiveData<AppState> = MutableLiveData(AppState.LOADING)
     val appState: LiveData<AppState> = _appState
 
-    private val _viewAllTransactionState: MutableLiveData<AppState> = MutableLiveData(AppState.LOADING)
+    private val _viewAllTransactionState: MutableLiveData<AppState> =
+        MutableLiveData(AppState.LOADING)
     val viewAllTransactionState: LiveData<AppState> = _viewAllTransactionState
 
     private val _recentTransactions: MutableLiveData<List<Transaction>> = MutableLiveData()
@@ -57,13 +62,15 @@ class MainViewModel @Inject constructor(
     private val _allTransactions: MutableLiveData<List<Transaction>> = MutableLiveData()
     val allTransaction: LiveData<List<Transaction>> = _allTransactions
 
-    private val _currentMonthExpense: MutableLiveData<String> = MutableLiveData()
-    val currentMonthExpense: LiveData<String> = _currentMonthExpense
+    private val _currentMonthExpense: MutableLiveData<Double> = MutableLiveData()
+    val currentMonthExpense: LiveData<Double> = _currentMonthExpense
 
-    private val _lastMonthExpense: MutableLiveData<String> = MutableLiveData()
-    val lastMonthExpense: LiveData<String> = _lastMonthExpense
+    private val _lastMonthExpense: MutableLiveData<Double> = MutableLiveData()
+    val lastMonthExpense: LiveData<Double> = _lastMonthExpense
 
     private var allTransactionJob: Job? = null
+
+    var preFetchedAmount: String = ""
 
     private val requiredPermissions = arrayOf(
         android.Manifest.permission.READ_SMS,
@@ -87,6 +94,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun dismissTransactionBottomSheet() {
+        preFetchedAmount = ""
         _showCustomTransaction.value = false
     }
 
@@ -97,7 +105,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun receivedSMSPermission(result: Map<String, Boolean>) {
+    fun onReceivedSMSPermission(result: Map<String, Boolean>) {
+
     }
 
     fun denySMSPermission() {
@@ -107,7 +116,8 @@ class MainViewModel @Inject constructor(
     fun checkForSmsPermission(context: Context) {
         viewModelScope.launch(dispatcherProvider.default) {
             val hasPermission = hasSmsPermission(context)
-            if (hasPermission.not()) {
+            val canAskPermission = canAskPermissionUseCase()
+            if (hasPermission.not() && canAskPermission) {
                 delay(1000)
                 _showSmsPermission.postValue(true)
             }
@@ -124,6 +134,9 @@ class MainViewModel @Inject constructor(
     }
 
     fun askForSmsPermission() {
+        viewModelScope.launch {
+            onPermissionAskedUseCase()
+        }
         _showSmsPermission.value = false
         _requestSmsPermission.value = true
     }
@@ -137,15 +150,20 @@ class MainViewModel @Inject constructor(
         _viewAllTransactionState.postValue(AppState.LOADING)
         allTransactionJob = viewModelScope.launch {
             getAllTransactionUseCase(transactionSelector).collect {
-                val state = if(it.isEmpty()) AppState.NO_TRANSACTION_FOUND else AppState.TRANSACTION_FOUND
+                val state =
+                    if (it.isEmpty()) AppState.NO_TRANSACTION_FOUND else AppState.TRANSACTION_FOUND
                 _viewAllTransactionState.postValue(state)
                 _allTransactions.postValue(it)
             }
         }
     }
 
+    fun loadCustomTransaction(startMillis: Long, endMillis: Long) {
+        _viewAllTransactionState.postValue(AppState.LOADING)
 
-    fun stopListeningAllTransaction(){
+    }
+
+    fun stopListeningAllTransaction() {
         allTransactionJob?.cancel()
         allTransactionJob = null
     }
