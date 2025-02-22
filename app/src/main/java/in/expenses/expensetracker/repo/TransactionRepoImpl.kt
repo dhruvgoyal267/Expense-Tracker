@@ -7,7 +7,6 @@ import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.toEntity
 import `in`.expenses.expensetracker.model.toObj
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -15,9 +14,9 @@ class TransactionRepoImpl @Inject constructor(
     private val transactionDao: TransactionDao,
     private val appDataStore: AppDataStore
 ) : TransactionRepo {
-    override suspend fun addTransaction(amount: String, spendOn: String) {
+    override suspend fun addTransaction(amount: String, spendOn: String, timeStamp: Long) {
         transactionDao.addTransaction(
-            TransactionEntity(amount = amount.toDouble(), spendOn = spendOn)
+            TransactionEntity(amount = amount.toDouble(), spendOn = spendOn, timeStamp = timeStamp)
         )
     }
 
@@ -71,5 +70,11 @@ class TransactionRepoImpl @Inject constructor(
     }
     override suspend fun permissionAskedCount(): Int {
         return appDataStore.permissionAskedCount()
+    }
+    override suspend fun isSmsProcessingDone(): Boolean {
+        return appDataStore.isSmsProcessingDone()
+    }
+    override suspend fun smsProcessingDone() {
+        appDataStore.smsProcessingDone()
     }
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import `in`.expenses.expensetracker.model.AppState
+import `in`.expenses.expensetracker.model.SmsProcessingState
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.usecases.AddTransactionUseCase
@@ -21,10 +22,13 @@ import `in`.expenses.expensetracker.usecases.GetCurrentMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
 import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCase
+import `in`.expenses.expensetracker.usecases.ProcessSmsUseCase
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
 import `in`.expenses.expensetracker.utils.DispatcherProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,7 +43,8 @@ class MainViewModel @Inject constructor(
     private val getCurrentMonthExpensesUseCase: GetCurrentMonthExpensesUseCase,
     private val getLastMonthExpensesUseCase: GetLastMonthExpensesUseCase,
     private val onPermissionAskedUseCase: OnPermissionAskedUseCase,
-    private val canAskPermissionUseCase: CanAskPermissionUseCase
+    private val canAskPermissionUseCase: CanAskPermissionUseCase,
+    private val processSmsUseCase: ProcessSmsUseCase
 ) : ViewModel() {
 
     private val _showSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -73,6 +78,11 @@ class MainViewModel @Inject constructor(
     private val _shouldShowAskSmsPermissionNudge: MutableLiveData<Boolean> = MutableLiveData(false)
     val shouldShowAskSmsPermissionNudge: LiveData<Boolean> = _shouldShowAskSmsPermissionNudge
 
+    private val _smsProcessingUIState: MutableStateFlow<SmsProcessingState> =
+        MutableStateFlow(SmsProcessingState.Default)
+    val smsProcessingState: StateFlow<SmsProcessingState> = _smsProcessingUIState
+
+    private var isSmsProcessingInProgress = false
     private var allTransactionJob: Job? = null
 
     var preFetchedAmount: String = ""
@@ -111,7 +121,25 @@ class MainViewModel @Inject constructor(
     }
 
     fun onReceivedSMSPermission(result: Map<String, Boolean>) {
-        _shouldShowAskSmsPermissionNudge.postValue(result.none { it.value })
+        val isPermissionGranted = result.all { it.value }
+        if (isPermissionGranted) {
+            processSms()
+        }
+        _shouldShowAskSmsPermissionNudge.postValue(isPermissionGranted.not())
+    }
+
+    private fun processSms() {
+        if (isSmsProcessingInProgress)
+            return
+        isSmsProcessingInProgress = true
+        viewModelScope.launch {
+            processSmsUseCase().collect {
+                _smsProcessingUIState.value = it
+                if (it is SmsProcessingState.Processed) {
+                    isSmsProcessingInProgress = false
+                }
+            }
+        }
     }
 
     fun denySMSPermission() {
@@ -122,17 +150,25 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.default) {
             val hasPermission = hasSmsPermission(context)
             val canAskPermission = canAskPermissionUseCase()
-            if (hasPermission.not() && canAskPermission) {
-                delay(1000)
-                _shouldShowAskSmsPermissionNudge.postValue(false)
-                _showSmsPermission.postValue(true)
-                onPermissionAskedUseCase()
-            } else if (canAskPermission.not()) {
-                _shouldShowAskSmsPermissionNudge.postValue(
-                    shouldShowRequestPermissionRationale(
-                        context
+            when {
+                hasPermission.not() && canAskPermission -> {
+                    delay(1000)
+                    _shouldShowAskSmsPermissionNudge.postValue(false)
+                    _showSmsPermission.postValue(true)
+                    onPermissionAskedUseCase()
+                }
+
+                canAskPermission.not() -> {
+                    _shouldShowAskSmsPermissionNudge.postValue(
+                        shouldShowRequestPermissionRationale(
+                            context
+                        )
                     )
-                )
+                }
+
+                hasPermission -> {
+                    processSms()
+                }
             }
         }
     }

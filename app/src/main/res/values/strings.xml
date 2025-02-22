@@ -17,4 +17,5 @@
     <string name="spend_on">Spend on</string>
     <string name="delete">Delete</string>
     <string name="update">Update</string>
+    <string name="please_do_not_close_the_app_until_we_finish_processing_your_sms_messages">Please do not close the app until we finish processing your SMS messages.</string>
 </resources>

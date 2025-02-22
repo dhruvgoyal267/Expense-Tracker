@@ -28,6 +28,8 @@ import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCaseImpl
 import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCase
 import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCaseImpl
+import `in`.expenses.expensetracker.usecases.ProcessSmsUseCase
+import `in`.expenses.expensetracker.usecases.ProcessSmsUseCaseImpl
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCaseImpl
 import `in`.expenses.expensetracker.utils.DispatcherProvider
@@ -84,4 +86,7 @@ abstract class UseCaseBinder {
 
     @Binds
     abstract fun bindCanAskPermissionUseCase(canAskPermissionUseCaseImpl: CanAskPermissionUseCaseImpl): CanAskPermissionUseCase
+
+    @Binds
+    abstract fun bindProcessSmsUseCase(processSmsUseCaseImpl: ProcessSmsUseCaseImpl): ProcessSmsUseCase
 }

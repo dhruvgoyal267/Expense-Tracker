@@ -8,8 +8,7 @@ import java.util.Locale
 data class Transaction(
     val amount: Double,
     val spendOn: String,
-    val date: String,
-    val id: Int
+    val date: String
 )
 
 fun Transaction.toEntity(): TransactionEntity {
@@ -17,9 +16,7 @@ fun Transaction.toEntity(): TransactionEntity {
         amount = amount,
         spendOn = spendOn,
         timeStamp = Calendar.getInstance().timeInMillis
-    ).apply {
-        this@apply.id = this@toEntity.id
-    }
+    )
 }
 
 fun TransactionEntity.toObj(): Transaction {
@@ -29,7 +26,6 @@ fun TransactionEntity.toObj(): Transaction {
     return Transaction(
         amount = amount,
         spendOn = spendOn,
-        date = sdf.format(calendar.time),
-        id = id
+        date = sdf.format(calendar.time)
     )
 }

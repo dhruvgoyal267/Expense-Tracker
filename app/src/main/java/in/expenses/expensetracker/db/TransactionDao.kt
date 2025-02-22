@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
-    @Query("Select * from TransactionEntity order by id desc")
+    @Query("Select * from TransactionEntity order by timeStamp desc")
     fun getAllTransaction(): Flow<List<TransactionEntity>>
-    @Query("Select * from TransactionEntity where timeStamp BETWEEN :start AND :end order by id desc")
+    @Query("Select * from TransactionEntity where timeStamp BETWEEN :start AND :end order by timeStamp desc")
     fun getCustomTransaction(start: Long, end: Long): Flow<List<TransactionEntity>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTransaction(transaction: TransactionEntity)
@@ -20,7 +20,7 @@ interface TransactionDao {
     suspend fun updateTransaction(transaction: TransactionEntity)
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)
-    @Query("Select * from TransactionEntity order by id desc limit :count")
+    @Query("Select * from TransactionEntity order by timeStamp desc limit :count")
     fun getLastNTransactionFlow(count: Int): Flow<List<TransactionEntity>>
     @Query("Select COALESCE(SUM(amount), 0) from TransactionEntity where timeStamp BETWEEN :start and :end")
     fun getTotalExpense(start: Long, end: Long): Flow<Double>

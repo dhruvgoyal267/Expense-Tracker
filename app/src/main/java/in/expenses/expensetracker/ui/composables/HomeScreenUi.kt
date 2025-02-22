@@ -3,13 +3,9 @@ package `in`.expenses.expensetracker.ui.composables
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -22,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import `in`.expenses.expensetracker.model.AppState
 import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.ui.MainViewModel
+import `in`.expenses.expensetracker.usecases.SmsProcessingUI
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,6 +88,8 @@ fun HomeScreenUi(
         TitleUi()
 
         VerticalSpacer(height = 16)
+
+        SmsProcessingUI(viewModel)
 
         val appState by viewModel.appState.observeAsState(AppState.LOADING)
 
