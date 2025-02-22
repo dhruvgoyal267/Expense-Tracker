@@ -1,73 +1,56 @@
 package `in`.expenses.expensetracker.ui.composables
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
-import `in`.expenses.expensetracker.ui.MainViewModel
+import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.utils.CustomPrimaryButton
+import `in`.expenses.expensetracker.utils.CustomSecondaryButton
+import `in`.expenses.expensetracker.utils.HorizontalSpacer
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 import `in`.expenses.expensetracker.utils.checkForEnableBtn
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCustomTransactionBottomSheet(viewModel: MainViewModel, sheetState: SheetState) {
+fun DeleteUpdateBottomSheetUI(
+    transaction: Transaction,
+    sheetState: SheetState,
+    dismiss: () -> Unit,
+    onDelete: () -> Unit,
+    onUpdate: (updatedTransaction: Transaction) -> Unit
+) {
     ModalBottomSheet(
-        onDismissRequest = {
-            viewModel.dismissTransactionBottomSheet()
-        },
+        onDismissRequest = dismiss,
         containerColor = colorResource(id = R.color.card_bg),
         sheetState = sheetState
     ) {
+        var enableAddBtn by remember {
+            mutableStateOf(false)
+        }
         Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-
-            var enableAddBtn by remember {
-                mutableStateOf(false)
+            var amount: String by remember {
+                mutableStateOf(transaction.amount.toString())
             }
 
-            var amount by remember {
-                mutableStateOf(viewModel.preFetchedAmount)
+            var spendOn: String by remember {
+                mutableStateOf(transaction.spendOn)
             }
-
-            var spendOn by remember {
-                mutableStateOf("")
-            }
-
-            Text(
-                text = stringResource(id = R.string.add_transaction),
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.title),
-                fontWeight = FontWeight.W500
-            )
-            VerticalSpacer(height = 4)
-
-            Text(
-                text = stringResource(id = R.string.add_your_custom_transaction_which_we_missed_to_record),
-                fontSize = 12.sp,
-                color = colorResource(id = R.color.sub_title),
-                lineHeight = 16.sp
-            )
-
-            VerticalSpacer(height = 24)
 
             AmountInputForm(
                 amount = amount,
@@ -84,12 +67,28 @@ fun AddCustomTransactionBottomSheet(viewModel: MainViewModel, sheetState: SheetS
 
             VerticalSpacer(height = 24)
 
-            CustomPrimaryButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.add_transaction),
-                enabled = enableAddBtn
-            ) {
-                viewModel.addTransaction(amount, spendOn)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                CustomSecondaryButton(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.delete)
+                ) {
+                    onDelete()
+                }
+
+                HorizontalSpacer()
+
+                CustomPrimaryButton(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.update),
+                    enabled = enableAddBtn
+                ) {
+                    onUpdate(
+                        transaction.copy(
+                            amount = amount.toDoubleOrNull() ?: 0.0,
+                            spendOn = spendOn
+                        )
+                    )
+                }
             }
         }
     }

@@ -68,3 +68,7 @@ fun formatAmount(amount: Double): String {
         else -> "₹$amount"
     }.replace(".0", "")
 }
+
+fun checkForEnableBtn(amount: String, spendOn: String): Boolean {
+    return amount.isNotBlank() && spendOn.isNotBlank()
+}

@@ -63,8 +63,9 @@ fun RecentTransactionUi(
                 Column {
                     TransactionUi(
                         modifier = Modifier.padding(vertical = 8.dp),
-                        transaction = transaction
-                    ) {}
+                        transaction = transaction,
+                        viewModel = viewModel
+                    )
                     Spacer(
                         modifier = Modifier
                             .height(1.dp)

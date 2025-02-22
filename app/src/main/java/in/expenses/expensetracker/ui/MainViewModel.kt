@@ -184,6 +184,17 @@ class MainViewModel @Inject constructor(
         allTransactionJob = null
     }
 
+    fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            updateTransactionUseCase(transaction = transaction)
+        }
+    }
+
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            deleteTransactionUseCase(transaction)
+        }
+    }
 
     fun loadExpenses() {
         viewModelScope.launch {

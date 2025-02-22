@@ -183,9 +183,9 @@ fun ViewAllTransactionUIComposable(
                             Column {
                                 TransactionUi(
                                     modifier = Modifier.padding(vertical = 8.dp),
+                                    viewModel = viewModel,
                                     transaction = transaction
-                                ) {
-                                }
+                                )
                                 Spacer(
                                     modifier = Modifier
                                         .height(1.dp)
