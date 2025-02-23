@@ -10,15 +10,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.model.AppState
+import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.ui.MainViewModel
-import `in`.expenses.expensetracker.usecases.SmsProcessingUI
+import `in`.expenses.expensetracker.usecases.ProcessingUI
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +92,12 @@ fun HomeScreenUi(
 
         VerticalSpacer(height = 16)
 
-        SmsProcessingUI(viewModel)
+        val smsProcessingState =
+            viewModel.smsProcessingState.collectAsState(
+                ProcessingState.Default
+            )
+
+        ProcessingUI(smsProcessingState.value, R.string.sms_processed)
 
         val appState by viewModel.appState.observeAsState(AppState.LOADING)
 

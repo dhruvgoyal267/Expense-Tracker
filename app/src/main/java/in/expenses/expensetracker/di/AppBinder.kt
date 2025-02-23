@@ -16,6 +16,8 @@ import `in`.expenses.expensetracker.usecases.CheckForTransactionSmsUseCase
 import `in`.expenses.expensetracker.usecases.CheckForTransactionSmsUseCaseImpl
 import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCase
 import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCaseImpl
+import `in`.expenses.expensetracker.usecases.ExportTransactionUseCase
+import `in`.expenses.expensetracker.usecases.ExportTransactionUseCaseImpl
 import `in`.expenses.expensetracker.usecases.ExtractAmountFromSmsUseCase
 import `in`.expenses.expensetracker.usecases.ExtractAmountFromSmsUseCaseImpl
 import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
@@ -89,4 +91,7 @@ abstract class UseCaseBinder {
 
     @Binds
     abstract fun bindProcessSmsUseCase(processSmsUseCaseImpl: ProcessSmsUseCaseImpl): ProcessSmsUseCase
+
+    @Binds
+    abstract fun bindExportTransactionUseCase(exportTransactionUseCaseImpl: ExportTransactionUseCaseImpl): ExportTransactionUseCase
 }

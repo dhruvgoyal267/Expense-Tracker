@@ -5,8 +5,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.compose.NavHost
@@ -30,27 +37,50 @@ class MainActivity : ComponentActivity() {
         checkForAmount(intent)
         setContent {
             ExpenseTrackerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = colorResource(id = R.color.app_bg)
-                ) {
-                    val navController = rememberNavController()
+                val snackbarHostState = remember { SnackbarHostState() }
 
-                    NavHost(
-                        navController = navController,
-                        startDestination = NavScreens.HOME.name
+                val toastMsgState = viewModel.toastMsg.collectAsState()
+
+                LaunchedEffect(key1 = toastMsgState.value) {
+                    toastMsgState.value.takeIf { it.isNotBlank() }?.let {
+                        snackbarHostState.showSnackbar(it)
+                    }
+                }
+
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(snackbarHostState)
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(it)
+                            .background(
+                                color = colorResource(id = R.color.app_bg)
+                            )
                     ) {
-                        composable(NavScreens.HOME.name) {
-                            HomeScreenUi(viewModel = viewModel) {
-                                navController.navigate("${NavScreens.VIEW_ALL_TRANSACTION.name}/${it.key}")
+                        val navController = rememberNavController()
+                        NavHost(
+                            navController = navController,
+                            startDestination = NavScreens.HOME.name
+                        ) {
+                            composable(NavScreens.HOME.name) {
+                                HomeScreenUi(viewModel = viewModel) {
+                                    navController.navigate("${NavScreens.VIEW_ALL_TRANSACTION.name}/${it.key}")
+                                }
                             }
-                        }
-                        composable("${NavScreens.VIEW_ALL_TRANSACTION.name}/{selectedOption}") { backStackEntry ->
-                            val selectedOption = backStackEntry.arguments?.getString("selectedOption")
-                            ViewAllTransactionsUI(viewModel = viewModel, selectedOption = TransactionSelector.getTransactionSelector(selectedOption)) {
-                                viewModel.stopListeningAllTransaction()
-                                navController.popBackStack()
+                            composable("${NavScreens.VIEW_ALL_TRANSACTION.name}/{selectedOption}") { backStackEntry ->
+                                val selectedOption =
+                                    backStackEntry.arguments?.getString("selectedOption")
+                                ViewAllTransactionsUI(
+                                    viewModel = viewModel,
+                                    selectedOption = TransactionSelector.getTransactionSelector(
+                                        selectedOption
+                                    )
+                                ) {
+                                    viewModel.stopListeningAllTransaction()
+                                    navController.popBackStack()
+                                }
                             }
                         }
                     }
@@ -59,7 +89,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun checkForAmount(intent: Intent){
+    private fun checkForAmount(intent: Intent) {
         val amount = intent.getStringExtra(AppConstants.AMOUNT)
         amount?.let {
             intent.removeExtra(AppConstants.AMOUNT)

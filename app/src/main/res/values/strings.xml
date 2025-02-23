@@ -18,4 +18,9 @@
     <string name="delete">Delete</string>
     <string name="update">Update</string>
     <string name="please_do_not_close_the_app_until_we_finish_processing_your_sms_messages">Please do not close the app until we finish processing your SMS messages.</string>
+    <string name="sms_processed">Sms Processed (%d\/%d)</string>
+    <string name="entry_processed">Entry Processed (%d\/%d)</string>
+    <string name="we_require_write_permission_to_export_the_transactions">We require write permission to export the transactions.</string>
+    <string name="no_transaction_found_for_selected_option">No transaction found for selected option</string>
+    <string name="the_file_has_been_successfully_exported_to_the_downloads_folder">The file has been successfully exported to the Downloads folder.</string>
 </resources>

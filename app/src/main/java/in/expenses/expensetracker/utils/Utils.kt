@@ -1,7 +1,11 @@
 package `in`.expenses.expensetracker.utils
 
 import `in`.expenses.expensetracker.model.TimeRange
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 
 fun getCurrentMonthTimeRange(): TimeRange {
@@ -48,6 +52,7 @@ fun getLastSixMonthTimeRange(): TimeRange {
     calendar.set(Calendar.MILLISECOND, 0)
 
     val month = calendar.get(Calendar.MONTH)
+    val year = calendar.get(Calendar.YEAR)
 
     calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 6)
 
@@ -55,6 +60,7 @@ fun getLastSixMonthTimeRange(): TimeRange {
 
     calendar.set(Calendar.MONTH, month + 1)
     calendar.set(Calendar.DAY_OF_MONTH, 1)
+    calendar.set(Calendar.YEAR, year)
     val monthEndTimeStamp = calendar.timeInMillis
 
     return TimeRange(monthStartTimeStamp, monthEndTimeStamp)
@@ -71,4 +77,18 @@ fun formatAmount(amount: Double): String {
 
 fun checkForEnableBtn(amount: String, spendOn: String): Boolean {
     return amount.isNotBlank() && spendOn.isNotBlank()
+}
+
+
+private const val FORMAT = "dd/MM/yyyy, hh:mm a"
+
+fun Long.formatDate(): String {
+    val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
+    return sdf.format(Date(this))
+}
+
+fun String.toMillis(): Long {
+    val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
+    sdf.timeZone = TimeZone.getDefault()
+    return sdf.parse(this)?.time ?: 0L
 }

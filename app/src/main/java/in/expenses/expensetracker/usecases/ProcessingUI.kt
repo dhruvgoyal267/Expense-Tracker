@@ -1,5 +1,6 @@
 package `in`.expenses.expensetracker.usecases
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,8 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -17,18 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
-import `in`.expenses.expensetracker.model.SmsProcessingState
-import `in`.expenses.expensetracker.ui.MainViewModel
+import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
 @Composable
-fun SmsProcessingUI(viewModel: MainViewModel) {
-    val smsProcessingState by viewModel.smsProcessingState.collectAsState(SmsProcessingState.Default)
-
-    when (val state = smsProcessingState) {
-        SmsProcessingState.Default -> Unit
-        SmsProcessingState.Processed -> Unit
-        is SmsProcessingState.Processing -> {
+fun ProcessingUI(processingState: ProcessingState, @StringRes titleSrc: Int) {
+    when (processingState) {
+        ProcessingState.Default -> Unit
+        ProcessingState.Processed -> Unit
+        is ProcessingState.Processing -> {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -39,7 +35,11 @@ fun SmsProcessingUI(viewModel: MainViewModel) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Sms Processed (${state.processed}/${state.total})",
+                    text = stringResource(
+                        id = titleSrc,
+                        processingState.processed,
+                        processingState.total
+                    ),
                     fontSize = 16.sp,
                     color = colorResource(id = R.color.title),
                     fontWeight = FontWeight.W500
@@ -50,7 +50,7 @@ fun SmsProcessingUI(viewModel: MainViewModel) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth(),
                     progress = {
-                        state.processed.toFloat() / state.total
+                        processingState.processed.toFloat() / processingState.total
                     },
                     color = colorResource(
                         id = R.color.tint,

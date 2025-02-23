@@ -11,12 +11,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import `in`.expenses.expensetracker.model.AppState
-import `in`.expenses.expensetracker.model.SmsProcessingState
+import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.TransactionSelector
 import `in`.expenses.expensetracker.usecases.AddTransactionUseCase
 import `in`.expenses.expensetracker.usecases.CanAskPermissionUseCase
 import `in`.expenses.expensetracker.usecases.DeleteTransactionUseCase
+import `in`.expenses.expensetracker.usecases.ExportTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetCurrentMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCase
@@ -44,7 +45,8 @@ class MainViewModel @Inject constructor(
     private val getLastMonthExpensesUseCase: GetLastMonthExpensesUseCase,
     private val onPermissionAskedUseCase: OnPermissionAskedUseCase,
     private val canAskPermissionUseCase: CanAskPermissionUseCase,
-    private val processSmsUseCase: ProcessSmsUseCase
+    private val processSmsUseCase: ProcessSmsUseCase,
+    private val exportTransactionUseCase: ExportTransactionUseCase
 ) : ViewModel() {
 
     private val _showSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -78,9 +80,16 @@ class MainViewModel @Inject constructor(
     private val _shouldShowAskSmsPermissionNudge: MutableLiveData<Boolean> = MutableLiveData(false)
     val shouldShowAskSmsPermissionNudge: LiveData<Boolean> = _shouldShowAskSmsPermissionNudge
 
-    private val _smsProcessingUIState: MutableStateFlow<SmsProcessingState> =
-        MutableStateFlow(SmsProcessingState.Default)
-    val smsProcessingState: StateFlow<SmsProcessingState> = _smsProcessingUIState
+    private val _smsProcessingUIState: MutableStateFlow<ProcessingState> =
+        MutableStateFlow(ProcessingState.Default)
+    val smsProcessingState: StateFlow<ProcessingState> = _smsProcessingUIState
+
+    private val _transactionProcessingUIState: MutableStateFlow<ProcessingState> =
+        MutableStateFlow(ProcessingState.Default)
+    val transactionProcessingUIState: StateFlow<ProcessingState> = _transactionProcessingUIState
+
+    private val _toastMsg: MutableStateFlow<String> = MutableStateFlow("")
+    val toastMsg: StateFlow<String> = _toastMsg
 
     private var isSmsProcessingInProgress = false
     private var allTransactionJob: Job? = null
@@ -135,7 +144,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             processSmsUseCase().collect {
                 _smsProcessingUIState.value = it
-                if (it is SmsProcessingState.Processed) {
+                if (it is ProcessingState.Processed) {
                     isSmsProcessingInProgress = false
                 }
             }
@@ -240,6 +249,18 @@ class MainViewModel @Inject constructor(
 
             getLastMonthExpensesUseCase().collect {
                 _lastMonthExpense.postValue(it)
+            }
+        }
+    }
+
+    fun showToast(msg: String) {
+        _toastMsg.value = msg
+    }
+
+    fun exportTransactions() {
+        viewModelScope.launch {
+            exportTransactionUseCase(transactions = _allTransactions.value.orEmpty()).collect {
+                _transactionProcessingUIState.value = it
             }
         }
     }
