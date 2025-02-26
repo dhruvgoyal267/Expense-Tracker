@@ -11,6 +11,7 @@ import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.utils.DispatcherProvider
 import `in`.expenses.expensetracker.utils.fileName
+import `in`.expenses.expensetracker.utils.formatAmount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -44,7 +45,7 @@ class ExportTransactionUseCaseImpl @Inject constructor(
 
                 for (transaction in transactions) {
                     emit(ProcessingState.Processing(counter++, total))
-                    csvData.append("${transaction.amount},${transaction.spendOn},${transaction.date}\n")
+                    csvData.append("${transaction.amount.toDoubleOrNull()?.formatAmount()},${transaction.spendOn},${transaction.date}\n")
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

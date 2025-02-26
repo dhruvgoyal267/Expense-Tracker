@@ -36,10 +36,18 @@ fun AmountInputForm(
     onSpendOnChanged: (spendOn: String) -> Unit,
     onDateTimeChanged: (time: String) -> Unit
 ) {
+
+    var isAmountError by remember {
+        mutableStateOf(false)
+    }
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = amount,
-        onValueChange = onAmountChanged,
+        onValueChange = {
+            isAmountError = it.toDoubleOrNull() == null
+            onAmountChanged(it)
+        },
+        isError = isAmountError,
         textStyle = TextStyle.Default.copy(
             color = colorResource(id = R.color.title),
             fontSize = 12.sp

@@ -6,7 +6,10 @@
     <string name="add">Add</string>
     <string name="no_transaction_found">No transaction found</string>
     <string name="allow_us_to_take_the_sms_permission">Allow us to take the SMS permission</string>
-    <string name="sms_permission_desc">We will not use your sms anywhere, it will be just to detect a transaction, so that it can be logged automatically</string>
+    <string name="sms_permission_desc">We will only access your SMS to detect transactions and log them automatically; your messages will not be used for any other purpose.</string>
+    <string name="import_transaction_title">Import transaction</string>
+    <string name="import_transaction_desc">Import your CSV transaction files in the format: Amount, SpendOn, Date, Time.</string>
+    <string name="import_cta">Import</string>
     <string name="deny_permission">Deny Permission</string>
     <string name="allow_permission">Allow permission</string>
     <string name="allow">Allow</string>
@@ -17,7 +20,7 @@
     <string name="spend_on">Spend on</string>
     <string name="delete">Delete</string>
     <string name="update">Update</string>
-    <string name="please_do_not_close_the_app_until_we_finish_processing_your_sms_messages">Please do not close the app until we finish processing your SMS messages.</string>
+    <string name="please_do_not_close_the_app_until_we_finish_processing_your_sms_messages">Please do not close the app until we finish processing the data.</string>
     <string name="sms_processed">Sms Processed (%d\/%d)</string>
     <string name="entry_processed">Entry Processed (%d\/%d)</string>
     <string name="we_require_write_permission_to_export_the_transactions">We require write permission to export the transactions.</string>
@@ -29,5 +32,10 @@
     <string name="select_date_range">Select date range</string>
     <string name="ok">OK</string>
     <string name="date">Date</string>
+    <string name="processing_done">Data processed successfully.</string>
+    <string name="import_processing_failed">The CSV data is not in the correct format. Please verify it before importing.</string>
+    <string name="export_processing_failed">Something unexpected happened while exporting. Please try again.</string>
+    <string name="sms_processing_failed">Something unexpected happened while processing SMS. Please try again.</string>
     <string name="write_storage_permission_msg">Please enable the Write External Storage permission in the app settings.</string>
+    <string name="no_transaction_msg">No transactions found. While we monitor your transactions, you can manually add one using the button below.</string>
 </resources>

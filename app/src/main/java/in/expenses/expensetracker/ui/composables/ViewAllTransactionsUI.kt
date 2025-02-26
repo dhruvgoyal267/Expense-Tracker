@@ -100,6 +100,7 @@ fun ViewAllTransactionUIComposable(
     val options = remember {
         TransactionSelector.TransactionSelectorEnum.values()
     }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = selectedOptionValue) {
         viewModel.loadPreDefinedCustomTransaction(selectedOptionValue)
@@ -115,14 +116,18 @@ fun ViewAllTransactionUIComposable(
         VerticalSpacer()
 
         val transactionProcessingState =
-            viewModel.transactionProcessingUIState.collectAsState(
+            viewModel.exportTransactionProcessingUIState.collectAsState(
                 ProcessingState.Default
             )
 
         ProcessingUI(
             processingState = transactionProcessingState.value,
             titleSrc = R.string.entry_processed
-        )
+        ) {
+            viewModel.showToast(
+                context.getString(if (it) R.string.processing_done else R.string.export_processing_failed)
+            )
+        }
 
         Box(modifier = Modifier) {
             Row(modifier = Modifier
@@ -201,7 +206,6 @@ fun ViewAllTransactionUIComposable(
 
                 AppState.TRANSACTION_FOUND -> {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        val context = LocalContext.current
                         val permissionLauncher = rememberLauncherForActivityResult(
                             contract = ActivityResultContracts.RequestPermission(),
                             onResult = { isGranted ->

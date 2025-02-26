@@ -20,10 +20,14 @@ import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
 @Composable
-fun ProcessingUI(processingState: ProcessingState, @StringRes titleSrc: Int) {
+fun ProcessingUI(
+    processingState: ProcessingState,
+    @StringRes titleSrc: Int,
+    onProcessingDone: (isSuccess: Boolean) -> Unit
+) {
     when (processingState) {
         ProcessingState.Default -> Unit
-        is ProcessingState.Processed -> Unit
+        is ProcessingState.Processed -> onProcessingDone(processingState.isError.not())
         is ProcessingState.Processing -> {
             Column(
                 modifier = Modifier

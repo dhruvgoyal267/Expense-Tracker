@@ -78,21 +78,29 @@ fun Double.formatAmount(): String {
 }
 
 fun checkForEnableBtn(amount: String, spendOn: String): Boolean {
-    return amount.isNotBlank() && spendOn.isNotBlank()
+    return amount.isNotBlank() && spendOn.isNotBlank() && amount.toDoubleOrNull() != null
 }
 
 
 private const val FORMAT = "dd/MM/yyyy, hh:mm a"
 private const val FILE_FORMAT = "dd_MM_yyyy_hh_mm_a"
 fun Long.formatDate(): String {
-    val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
-    return sdf.format(Date(this))
+    return try {
+        val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
+        sdf.format(Date(this))
+    } catch (e: Exception) {
+        ""
+    }
 }
 
 fun String.toMillis(): Long {
-    val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
-    sdf.timeZone = TimeZone.getDefault()
-    return sdf.parse(this)?.time ?: 0L
+    return try {
+        val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
+        sdf.timeZone = TimeZone.getDefault()
+        sdf.parse(this)?.time ?: 0L
+    } catch (e: Exception) {
+        0
+    }
 }
 
 fun Long.fileName(): String {

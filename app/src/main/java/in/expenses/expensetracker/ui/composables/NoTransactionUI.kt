@@ -16,12 +16,14 @@ import androidx.compose.ui.unit.sp
 import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.ui.MainViewModel
 import `in`.expenses.expensetracker.utils.CustomPrimaryButton
+import `in`.expenses.expensetracker.utils.CustomSecondaryButton
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 
 @Composable
 fun NoTransactionUI(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    importFile: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -41,7 +43,7 @@ fun NoTransactionUI(
         VerticalSpacer()
 
         Text(
-            text = "No transaction found, while we are keeping an eye on your transactions you can add it on your own using button below",
+            text = stringResource(R.string.no_transaction_msg),
             fontSize = 12.sp,
             color = colorResource(
                 id = R.color.sub_title
@@ -57,5 +59,16 @@ fun NoTransactionUI(
         ) {
             viewModel.addCustomTransaction()
         }
+
+        VerticalSpacer()
+
+        CustomActionTileUI(
+            title = stringResource(R.string.import_transaction_title),
+            desc = stringResource(
+                id = R.string.import_transaction_desc
+            ),
+            cta = stringResource(id = R.string.import_cta),
+            btnAction = importFile
+        )
     }
 }

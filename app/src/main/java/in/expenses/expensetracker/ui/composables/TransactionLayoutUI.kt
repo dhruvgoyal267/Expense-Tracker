@@ -21,6 +21,7 @@ import `in`.expenses.expensetracker.utils.VerticalSpacer
 fun TransactionLayoutUi(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel,
+    importFile: ()-> Unit,
     onViewMore: (transactionSelector: TransactionSelector.TransactionSelectorEnum) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -90,6 +91,17 @@ fun TransactionLayoutUi(
                 viewModel.askForSmsPermission()
             }
         }
+
+        VerticalSpacer(height = 16)
+
+        CustomActionTileUI(
+            title = stringResource(R.string.import_transaction_title),
+            desc = stringResource(
+                id = R.string.import_transaction_desc
+            ),
+            cta = stringResource(id = R.string.import_cta),
+            btnAction = importFile
+        )
 
         VerticalSpacer(height = 16)
     }

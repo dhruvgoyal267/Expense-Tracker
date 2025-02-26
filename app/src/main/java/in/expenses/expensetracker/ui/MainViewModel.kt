@@ -3,6 +3,7 @@ package `in`.expenses.expensetracker.ui
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -22,6 +23,7 @@ import `in`.expenses.expensetracker.usecases.GetAllTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetCurrentMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
+import `in`.expenses.expensetracker.usecases.ImportTransactionUseCase
 import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCase
 import `in`.expenses.expensetracker.usecases.ProcessSmsUseCase
 import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
@@ -46,7 +48,8 @@ class MainViewModel @Inject constructor(
     private val onPermissionAskedUseCase: OnPermissionAskedUseCase,
     private val canAskPermissionUseCase: CanAskPermissionUseCase,
     private val processSmsUseCase: ProcessSmsUseCase,
-    private val exportTransactionUseCase: ExportTransactionUseCase
+    private val exportTransactionUseCase: ExportTransactionUseCase,
+    private val importTransactionUseCase: ImportTransactionUseCase
 ) : ViewModel() {
 
     private val _showSmsPermission: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -84,9 +87,15 @@ class MainViewModel @Inject constructor(
         MutableStateFlow(ProcessingState.Default)
     val smsProcessingState: StateFlow<ProcessingState> = _smsProcessingUIState
 
-    private val _transactionProcessingUIState: MutableStateFlow<ProcessingState> =
+    private val _exportTransactionProcessingUIState: MutableStateFlow<ProcessingState> =
         MutableStateFlow(ProcessingState.Default)
-    val transactionProcessingUIState: StateFlow<ProcessingState> = _transactionProcessingUIState
+    val exportTransactionProcessingUIState: StateFlow<ProcessingState> =
+        _exportTransactionProcessingUIState
+
+    private val _importTransactionProcessingUIState: MutableStateFlow<ProcessingState> =
+        MutableStateFlow(ProcessingState.Default)
+    val importTransactionProcessingUIState: StateFlow<ProcessingState> =
+        _importTransactionProcessingUIState
 
     private val _toastMsg: MutableStateFlow<String> = MutableStateFlow("")
     val toastMsg: StateFlow<String> = _toastMsg
@@ -260,7 +269,15 @@ class MainViewModel @Inject constructor(
     fun exportTransactions() {
         viewModelScope.launch {
             exportTransactionUseCase(transactions = _allTransactions.value.orEmpty()).collect {
-                _transactionProcessingUIState.value = it
+                _exportTransactionProcessingUIState.value = it
+            }
+        }
+    }
+
+    fun importTransaction(uri: Uri) {
+        viewModelScope.launch {
+            importTransactionUseCase(uri).collect {
+                _importTransactionProcessingUIState.value = it
             }
         }
     }

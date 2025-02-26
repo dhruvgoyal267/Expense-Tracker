@@ -28,6 +28,8 @@ import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCase
 import `in`.expenses.expensetracker.usecases.GetLastMonthExpensesUseCaseImpl
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCase
 import `in`.expenses.expensetracker.usecases.GetNTransactionUseCaseImpl
+import `in`.expenses.expensetracker.usecases.ImportTransactionUseCase
+import `in`.expenses.expensetracker.usecases.ImportTransactionUseCaseImpl
 import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCase
 import `in`.expenses.expensetracker.usecases.OnPermissionAskedUseCaseImpl
 import `in`.expenses.expensetracker.usecases.ProcessSmsUseCase
@@ -94,4 +96,6 @@ abstract class UseCaseBinder {
 
     @Binds
     abstract fun bindExportTransactionUseCase(exportTransactionUseCaseImpl: ExportTransactionUseCaseImpl): ExportTransactionUseCase
+    @Binds
+    abstract fun bindImportTransactionUseCase(importTransactionUseCaseImpl: ImportTransactionUseCaseImpl): ImportTransactionUseCase
 }

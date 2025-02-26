@@ -30,6 +30,16 @@ fun HomeScreenUi(
     viewModel: MainViewModel,
     onViewMore: (transactionSelector: TransactionSelector.TransactionSelectorEnum) -> Unit
 ) {
+
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let { selectedUri ->
+                viewModel.importTransaction(selectedUri)
+            }
+        }
+    )
+
     val context = LocalContext.current
     LaunchedEffect(key1 = null) {
         viewModel.checkForSmsPermission(context)
@@ -97,7 +107,20 @@ fun HomeScreenUi(
                 ProcessingState.Default
             )
 
-        ProcessingUI(smsProcessingState.value, R.string.sms_processed)
+        val importProcessingState =
+            viewModel.importTransactionProcessingUIState.collectAsState(
+                ProcessingState.Default
+            )
+
+        ProcessingUI(smsProcessingState.value, R.string.sms_processed) {
+            viewModel.showToast(
+                context.getString(if (it) R.string.processing_done else R.string.sms_processing_failed))
+        }
+
+        ProcessingUI(importProcessingState.value, R.string.entry_processed) {
+            viewModel.showToast(
+                context.getString(if (it) R.string.processing_done else R.string.import_processing_failed))
+        }
 
         val appState by viewModel.appState.observeAsState(AppState.LOADING)
 
@@ -111,11 +134,16 @@ fun HomeScreenUi(
 
                 AppState.LOADING -> Loader()
 
-                AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(viewModel = viewModel)
+                AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(viewModel = viewModel) {
+                    pickFileLauncher.launch(arrayOf("application/csv", "text/comma-separated-values"))
+                }
 
                 AppState.TRANSACTION_FOUND -> TransactionLayoutUi(
                     viewModel = viewModel,
-                    onViewMore = onViewMore
+                    onViewMore = onViewMore,
+                    importFile = {
+                        pickFileLauncher.launch(arrayOf("application/csv", "text/comma-separated-values"))
+                    }
                 )
             }
         }
