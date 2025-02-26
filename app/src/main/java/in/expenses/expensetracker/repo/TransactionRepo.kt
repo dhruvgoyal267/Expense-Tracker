@@ -4,7 +4,7 @@ import `in`.expenses.expensetracker.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepo {
-    suspend fun addTransaction(amount: String, spendOn: String, timeStamp: Long)
+    suspend fun addTransaction(transaction: Transaction)
     suspend fun updateTransaction(transaction: Transaction)
     suspend fun deleteTransaction(transaction: Transaction)
     suspend fun getAllTransaction(): Flow<List<Transaction>>

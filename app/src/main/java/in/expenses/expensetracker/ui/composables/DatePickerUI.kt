@@ -2,9 +2,9 @@ package `in`.expenses.expensetracker.ui.composables
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.DateRangePickerState
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
@@ -23,18 +23,17 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateRangePickerUI(onDateRangeSelected: (startDate: Long, endDate: Long) -> Unit) {
+fun DatePickerUI(onDateSelected: (date: Long) -> Unit) {
     val dateTime = Calendar.getInstance()
     val finalDateTime = dateTime.timeInMillis
     dateTime.add(Calendar.DATE, -30)
     val initialDateTime = dateTime.timeInMillis
     dateTime.add(Calendar.DATE, 30)
     val colors = getDatePickerColors()
-    val dateRangePickerState = remember {
-        DateRangePickerState(
-            initialSelectedStartDateMillis = initialDateTime,
+    val datePickerState = remember {
+        DatePickerState(
+            initialSelectedDateMillis = initialDateTime,
             initialDisplayedMonthMillis = finalDateTime,
-            initialSelectedEndDateMillis = finalDateTime,
             initialDisplayMode = DisplayMode.Picker,
             yearRange = 1970..dateTime.get(Calendar.YEAR),
             locale = Locale.ENGLISH,
@@ -49,33 +48,24 @@ fun DateRangePickerUI(onDateRangeSelected: (startDate: Long, endDate: Long) -> U
     DatePickerDialog(
         colors = colors,
         onDismissRequest = {
-            onDateRangeSelected(
-                dateRangePickerState.selectedStartDateMillis ?: 0,
-                dateRangePickerState.selectedEndDateMillis ?: 0
-            )
+            onDateSelected(datePickerState.selectedDateMillis?:0)
         },
         confirmButton = {
             TextButton(onClick = {
-                onDateRangeSelected(
-                    dateRangePickerState.selectedStartDateMillis ?: 0,
-                    dateRangePickerState.selectedEndDateMillis ?: 0
-                )
+                onDateSelected(datePickerState.selectedDateMillis?:0)
             }) {
-                Text(
-                    text = stringResource(id = R.string.ok),
-                    color = colorResource(id = R.color.tint)
-                )
+                Text(text = stringResource(R.string.ok), color = colorResource(id = R.color.tint))
             }
         }
     ) {
-        DateRangePicker(
-            state = dateRangePickerState,
+        DatePicker(
+            state = datePickerState,
             title = {},
             headline = {
                 Text(
                     modifier = Modifier.padding(16.dp),
                     text = stringResource(
-                        R.string.select_date_range
+                        R.string.select_date
                     ),
                     color = colorResource(id = R.color.title)
                 )

@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,4 +62,24 @@ fun CustomSecondaryButton(modifier: Modifier = Modifier, text: String, action: (
     ) {
         Text(text = text, color = colorResource(id = R.color.tint), fontSize = 12.sp)
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun getDatePickerColors(): DatePickerColors {
+    return DatePickerDefaults.colors(
+        containerColor = colorResource(id = R.color.app_bg),
+        titleContentColor = colorResource(id = R.color.title),
+        headlineContentColor = colorResource(id = R.color.title),
+        weekdayContentColor = colorResource(id = R.color.title),
+        subheadContentColor = colorResource(id = R.color.title),
+        yearContentColor = colorResource(id = R.color.title),
+        currentYearContentColor = colorResource(id = R.color.title),
+        selectedYearContainerColor = colorResource(id = R.color.title),
+        disabledDayContentColor = colorResource(id = R.color.disabled_text),
+        todayDateBorderColor = colorResource(id = R.color.tint),
+        dayInSelectionRangeContainerColor = colorResource(id = R.color.tint).copy(alpha = 0.2f),
+        dayInSelectionRangeContentColor = colorResource(id = R.color.tint),
+        selectedDayContainerColor = colorResource(id = R.color.tint)
+    )
 }

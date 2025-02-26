@@ -24,6 +24,7 @@ import `in`.expenses.expensetracker.ui.MainViewModel
 import `in`.expenses.expensetracker.utils.CustomPrimaryButton
 import `in`.expenses.expensetracker.utils.VerticalSpacer
 import `in`.expenses.expensetracker.utils.checkForEnableBtn
+import `in`.expenses.expensetracker.utils.formatDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +53,10 @@ fun AddCustomTransactionBottomSheet(viewModel: MainViewModel, sheetState: SheetS
                 mutableStateOf("")
             }
 
+            var dateTime by remember {
+                mutableStateOf(System.currentTimeMillis().formatDate())
+            }
+
             Text(
                 text = stringResource(id = R.string.add_transaction),
                 fontSize = 16.sp,
@@ -72,6 +77,7 @@ fun AddCustomTransactionBottomSheet(viewModel: MainViewModel, sheetState: SheetS
             AmountInputForm(
                 amount = amount,
                 spendOn = spendOn,
+                date = dateTime,
                 onAmountChanged = {
                     amount = it
                     enableAddBtn = checkForEnableBtn(amount, spendOn)
@@ -79,6 +85,9 @@ fun AddCustomTransactionBottomSheet(viewModel: MainViewModel, sheetState: SheetS
                 onSpendOnChanged = {
                     spendOn = it
                     enableAddBtn = checkForEnableBtn(amount, spendOn)
+                },
+                onDateTimeChanged = {
+                    dateTime = it
                 }
             )
 
@@ -89,7 +98,7 @@ fun AddCustomTransactionBottomSheet(viewModel: MainViewModel, sheetState: SheetS
                 text = stringResource(id = R.string.add_transaction),
                 enabled = enableAddBtn
             ) {
-                viewModel.addTransaction(amount, spendOn)
+                viewModel.addTransaction(amount, spendOn, dateTime)
             }
         }
     }

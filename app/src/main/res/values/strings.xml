@@ -23,4 +23,9 @@
     <string name="we_require_write_permission_to_export_the_transactions">We require write permission to export the transactions.</string>
     <string name="no_transaction_found_for_selected_option">No transaction found for selected option</string>
     <string name="the_file_has_been_successfully_exported_to_the_downloads_folder">The file has been successfully exported to the Downloads folder.</string>
+    <string name="select_time">Select time</string>
+    <string name="select_date">Select date</string>
+    <string name="select_date_range">Select date range</string>
+    <string name="ok">OK</string>
+    <string name="date">Date</string>
 </resources>

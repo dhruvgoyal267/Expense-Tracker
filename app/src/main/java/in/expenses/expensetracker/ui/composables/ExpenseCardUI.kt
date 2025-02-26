@@ -27,7 +27,7 @@ fun ExpenseCardUI(
     val expense = if(amount == 0.0){
         "NA"
     } else {
-        formatAmount(amount)
+        amount.formatAmount()
     }
 
     Column(

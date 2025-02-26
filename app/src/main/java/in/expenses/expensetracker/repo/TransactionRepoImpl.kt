@@ -2,7 +2,6 @@ package `in`.expenses.expensetracker.repo
 
 import `in`.expenses.expensetracker.datastore.AppDataStore
 import `in`.expenses.expensetracker.db.TransactionDao
-import `in`.expenses.expensetracker.db.TransactionEntity
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.model.toEntity
 import `in`.expenses.expensetracker.model.toObj
@@ -14,10 +13,8 @@ class TransactionRepoImpl @Inject constructor(
     private val transactionDao: TransactionDao,
     private val appDataStore: AppDataStore
 ) : TransactionRepo {
-    override suspend fun addTransaction(amount: String, spendOn: String, timeStamp: Long) {
-        transactionDao.addTransaction(
-            TransactionEntity(amount = amount.toDouble(), spendOn = spendOn, timeStamp = timeStamp)
-        )
+    override suspend fun addTransaction(transaction: Transaction) {
+        transactionDao.addTransaction(transaction.toEntity())
     }
 
     override suspend fun updateTransaction(transaction: Transaction) {

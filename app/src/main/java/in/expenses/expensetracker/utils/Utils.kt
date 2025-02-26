@@ -25,6 +25,7 @@ fun getCurrentMonthTimeRange(): TimeRange {
 
     return TimeRange(monthStartTimeStamp, monthEndTimeStamp)
 }
+
 fun getLastMonthTimeRange(): TimeRange {
     val calendar = Calendar.getInstance()
     calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -43,6 +44,7 @@ fun getLastMonthTimeRange(): TimeRange {
 
     return TimeRange(monthStartTimeStamp, monthEndTimeStamp)
 }
+
 fun getLastSixMonthTimeRange(): TimeRange {
     val calendar = Calendar.getInstance()
 
@@ -66,12 +68,12 @@ fun getLastSixMonthTimeRange(): TimeRange {
     return TimeRange(monthStartTimeStamp, monthEndTimeStamp)
 }
 
-fun formatAmount(amount: Double): String {
+fun Double.formatAmount(): String {
     return when {
-        amount >= 1_00_00_000 -> String.format("₹%.1fCr", amount / 1_00_00_000.0)
-        amount >= 1_00_000 -> String.format("₹%.1fL", amount / 1_00_000.0)
-        amount >= 1_000 -> String.format("₹%.1fK", amount / 1_000.0)
-        else -> "₹$amount"
+        this >= 1_00_00_000 -> String.format("₹%.1fCr", this / 1_00_00_000.0)
+        this >= 1_00_000 -> String.format("₹%.1fL", this / 1_00_000.0)
+        this >= 1_000 -> String.format("₹%.1fK", this / 1_000.0)
+        else -> "₹$this"
     }.replace(".0", "")
 }
 

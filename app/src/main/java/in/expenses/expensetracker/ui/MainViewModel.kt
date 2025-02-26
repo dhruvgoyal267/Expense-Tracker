@@ -122,10 +122,10 @@ class MainViewModel @Inject constructor(
         _showCustomTransaction.value = false
     }
 
-    fun addTransaction(amount: String, spendOn: String) {
+    fun addTransaction(amount: String, spendOn: String, date: String) {
         _showCustomTransaction.value = false
         viewModelScope.launch {
-            addTransactionUseCase(amount, spendOn)
+            addTransactionUseCase(amount, spendOn, date)
         }
     }
 
@@ -229,9 +229,9 @@ class MainViewModel @Inject constructor(
         allTransactionJob = null
     }
 
-    fun updateTransaction(transaction: Transaction) {
+    fun updateTransaction(oldTransaction: Transaction, newTransaction: Transaction) {
         viewModelScope.launch {
-            updateTransactionUseCase(transaction = transaction)
+            updateTransactionUseCase(oldTransaction, newTransaction)
         }
     }
 

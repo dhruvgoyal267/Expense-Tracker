@@ -51,7 +51,7 @@ fun TransactionUi(
             },
             onUpdate = { newTransaction ->
                 showBottomSheet = false
-                viewModel.updateTransaction(newTransaction)
+                viewModel.updateTransaction(transaction, newTransaction)
             }
         )
     }
@@ -75,7 +75,7 @@ fun TransactionUi(
     ) {
         Column {
             Text(
-                text = formatAmount(transaction.amount),
+                text = transaction.amount.toDoubleOrNull()?.formatAmount().orEmpty(),
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.title)
             )

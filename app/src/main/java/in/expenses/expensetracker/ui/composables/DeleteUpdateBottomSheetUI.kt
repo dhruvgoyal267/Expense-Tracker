@@ -52,11 +52,20 @@ fun DeleteUpdateBottomSheetUI(
                 mutableStateOf(transaction.spendOn)
             }
 
+            var dateTime: String by remember {
+                mutableStateOf(transaction.date)
+            }
+
             AmountInputForm(
                 amount = amount,
                 spendOn = spendOn,
+                date = dateTime,
                 onAmountChanged = {
                     amount = it
+                    enableAddBtn = checkForEnableBtn(amount, spendOn)
+                },
+                onDateTimeChanged = {
+                    dateTime = it
                     enableAddBtn = checkForEnableBtn(amount, spendOn)
                 },
                 onSpendOnChanged = {
@@ -84,8 +93,9 @@ fun DeleteUpdateBottomSheetUI(
                 ) {
                     onUpdate(
                         transaction.copy(
-                            amount = amount.toDoubleOrNull() ?: 0.0,
-                            spendOn = spendOn
+                            amount = amount,
+                            spendOn = spendOn,
+                            date = dateTime
                         )
                     )
                 }

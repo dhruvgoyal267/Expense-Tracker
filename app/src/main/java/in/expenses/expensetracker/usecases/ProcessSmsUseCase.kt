@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.repo.TransactionRepo
 import `in`.expenses.expensetracker.utils.DispatcherProvider
+import `in`.expenses.expensetracker.utils.formatDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -45,7 +46,7 @@ class ProcessSmsUseCaseImpl @Inject constructor(
                             val timeStamp = it.getLong(indexDate)
                             extractAmountFromSmsUseCase(smsBody)?.takeIf { amount -> amount.isNotBlank() }
                                 ?.let { amount ->
-                                    addTransactionUseCase(amount, "Auto Processed", timeStamp)
+                                    addTransactionUseCase(amount, "Auto Processed", timeStamp.formatDate())
                                 }
                         }
                         emit(ProcessingState.Processed)
