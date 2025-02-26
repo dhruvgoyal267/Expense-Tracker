@@ -3,14 +3,14 @@ package `in`.expenses.expensetracker.usecases
 import android.content.ContentValues
 import android.content.Context
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.utils.DispatcherProvider
-import `in`.expenses.expensetracker.utils.formatDate
-import kotlinx.coroutines.delay
+import `in`.expenses.expensetracker.utils.fileName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -31,11 +31,11 @@ class ExportTransactionUseCaseImpl @Inject constructor(
         withContext(dispatcherProvider.io) {
             flow {
                 if (transactions.isEmpty()) {
-                    emit(ProcessingState.Processed)
+                    emit(ProcessingState.Processed(true))
                     return@flow
                 }
 
-                val fileName = "transactions_${System.currentTimeMillis().formatDate()}.csv"
+                val fileName = "transactions_${System.currentTimeMillis().fileName()}.csv"
 
                 var counter = 1
                 val total = transactions.size
@@ -51,16 +51,27 @@ class ExportTransactionUseCaseImpl @Inject constructor(
                     saveCsvFileToDownloads(context, fileName, csvData.toString())
                 } else {
                     try {
-                        val csvFile = File(context.getExternalFilesDir(null), fileName)
+                        val directory =
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        if (directory.exists().not()) {
+                            directory.mkdir()
+                        }
+                        val csvFile = File(directory, fileName)
+
+                        if (csvFile.isDirectory) {
+                            csvFile.delete()
+                        }
+
                         val writer = FileWriter(csvFile)
                         writer.append(csvData)
                         writer.flush()
                         writer.close()
+                        emit(ProcessingState.Processed(false))
                     } catch (e: IOException) {
+                        emit(ProcessingState.Processed(true))
                         e.printStackTrace()
                     }
                 }
-                emit(ProcessingState.Processed)
             }
         }
 

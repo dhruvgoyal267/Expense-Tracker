@@ -23,7 +23,7 @@ import `in`.expenses.expensetracker.utils.VerticalSpacer
 fun ProcessingUI(processingState: ProcessingState, @StringRes titleSrc: Int) {
     when (processingState) {
         ProcessingState.Default -> Unit
-        ProcessingState.Processed -> Unit
+        is ProcessingState.Processed -> Unit
         is ProcessingState.Processing -> {
             Column(
                 modifier = Modifier

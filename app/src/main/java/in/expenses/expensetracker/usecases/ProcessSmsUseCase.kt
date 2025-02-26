@@ -49,11 +49,11 @@ class ProcessSmsUseCaseImpl @Inject constructor(
                                     addTransactionUseCase(amount, "Auto Processed", timeStamp.formatDate())
                                 }
                         }
-                        emit(ProcessingState.Processed)
+                        emit(ProcessingState.Processed(true))
                         transactionRepo.smsProcessingDone()
                     } ?: false
                 } catch (e: Exception) {
-                    emit(ProcessingState.Processed)
+                    emit(ProcessingState.Processed(true))
                 }
             }
         }

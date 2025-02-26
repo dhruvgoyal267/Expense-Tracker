@@ -1,5 +1,6 @@
 package `in`.expenses.expensetracker.ui.composables
 
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.BackHandler
@@ -46,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import `in`.expenses.expensetracker.R
 import `in`.expenses.expensetracker.model.AppState
@@ -238,20 +240,23 @@ fun ViewAllTransactionUIComposable(
                         }
 
                         if (transactions.isNotEmpty()) {
-                            if (transactionProcessingState.value == ProcessingState.Processed) {
+                            (transactionProcessingState.value as? ProcessingState.Processed)?.let { state ->
                                 viewModel.showToast(
                                     stringResource(
-                                        R.string.the_file_has_been_successfully_exported_to_the_downloads_folder
+                                        if (state.isError) {
+                                            R.string.file_exported_error
+                                        } else {
+                                            R.string.the_file_has_been_successfully_exported_to_the_downloads_folder
+                                        }
                                     )
                                 )
                             }
 
                             val isBtnEnabled by remember {
                                 derivedStateOf {
-                                    when (transactionProcessingState.value) {
-                                        ProcessingState.Default,
-                                        ProcessingState.Processed -> true
-
+                                    when (val state = transactionProcessingState.value) {
+                                        ProcessingState.Default -> true
+                                        is ProcessingState.Processed -> state.isError.not()
                                         is ProcessingState.Processing -> false
                                     }
                                 }
@@ -273,8 +278,14 @@ fun ViewAllTransactionUIComposable(
                                             ) == PackageManager.PERMISSION_GRANTED
                                         ) {
                                             viewModel.exportTransactions()
-                                        } else {
+                                        } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                                context as Activity,
+                                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                            )
+                                        ) {
                                             permissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                        } else {
+                                            viewModel.showToast(context.getString(R.string.write_storage_permission_msg))
                                         }
                                     } else {
                                         viewModel.exportTransactions()

@@ -83,7 +83,7 @@ fun checkForEnableBtn(amount: String, spendOn: String): Boolean {
 
 
 private const val FORMAT = "dd/MM/yyyy, hh:mm a"
-
+private const val FILE_FORMAT = "dd_MM_yyyy_hh_mm_a"
 fun Long.formatDate(): String {
     val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
     return sdf.format(Date(this))
@@ -93,4 +93,9 @@ fun String.toMillis(): Long {
     val sdf = SimpleDateFormat(FORMAT, Locale.getDefault())
     sdf.timeZone = TimeZone.getDefault()
     return sdf.parse(this)?.time ?: 0L
+}
+
+fun Long.fileName(): String {
+    val sdf = SimpleDateFormat(FILE_FORMAT, Locale.getDefault())
+    return sdf.format(Date(this))
 }
