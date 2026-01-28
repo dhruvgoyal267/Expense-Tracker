@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -30,7 +31,9 @@ import `in`.expenses.expensetracker.usecases.UpdateTransactionUseCase
 import `in`.expenses.expensetracker.utils.DispatcherProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -97,20 +100,25 @@ class MainViewModel @Inject constructor(
     val importTransactionProcessingUIState: StateFlow<ProcessingState> =
         _importTransactionProcessingUIState
 
-    private val _toastMsg: MutableStateFlow<String> = MutableStateFlow("")
-    val toastMsg: StateFlow<String> = _toastMsg
+    private val _toastMsg: MutableSharedFlow<String> = MutableSharedFlow(replay = 0, extraBufferCapacity = 1)
+    val toastMsg: SharedFlow<String> = _toastMsg
 
     private var isSmsProcessingInProgress = false
     private var allTransactionJob: Job? = null
 
     var preFetchedAmount: String = ""
 
-    private val requiredPermissions = arrayOf(
+    private val requiredPermissions = mutableListOf(
         android.Manifest.permission.READ_SMS,
         android.Manifest.permission.RECEIVE_SMS
     )
 
-    fun getRequiredPermissions(): Array<String> = requiredPermissions
+    fun getRequiredPermissions(): Array<String> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requiredPermissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+        return requiredPermissions.toTypedArray()
+    }
 
     fun getCurrentState() {
         viewModelScope.launch {
@@ -263,7 +271,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun showToast(msg: String) {
-        _toastMsg.value = msg
+        println("Dhruv: Emitting: $msg")
+        viewModelScope.launch {
+            _toastMsg.emit(msg)
+        }
     }
 
     fun exportTransactions() {

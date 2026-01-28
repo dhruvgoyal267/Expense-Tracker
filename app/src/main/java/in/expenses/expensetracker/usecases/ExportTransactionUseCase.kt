@@ -12,8 +12,10 @@ import `in`.expenses.expensetracker.model.Transaction
 import `in`.expenses.expensetracker.utils.DispatcherProvider
 import `in`.expenses.expensetracker.utils.fileName
 import `in`.expenses.expensetracker.utils.formatAmount
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileWriter
@@ -45,11 +47,16 @@ class ExportTransactionUseCaseImpl @Inject constructor(
 
                 for (transaction in transactions) {
                     emit(ProcessingState.Processing(counter++, total))
-                    csvData.append("${transaction.amount.toDoubleOrNull()?.formatAmount()},${transaction.spendOn},${transaction.date}\n")
+                    csvData.append(
+                        "${
+                            transaction.amount.toDoubleOrNull()?.formatAmount()
+                        },${transaction.spendOn},${transaction.date}\n"
+                    )
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     saveCsvFileToDownloads(context, fileName, csvData.toString())
+                    emit(ProcessingState.Processed(false))
                 } else {
                     try {
                         val directory =
@@ -73,7 +80,7 @@ class ExportTransactionUseCaseImpl @Inject constructor(
                         e.printStackTrace()
                     }
                 }
-            }
+            }.flowOn(dispatcherProvider.io)
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)

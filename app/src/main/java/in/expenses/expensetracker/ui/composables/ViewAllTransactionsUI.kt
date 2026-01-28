@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -120,14 +121,27 @@ fun ViewAllTransactionUIComposable(
                 ProcessingState.Default
             )
 
+        LaunchedEffect(key1 = transactionProcessingState) {
+            when (val state = transactionProcessingState.value) {
+                is ProcessingState.Processed -> {
+                    viewModel.showToast(
+                        context.getString(
+                            if (state.isError.not())
+                                R.string.processing_done
+                            else
+                                R.string.export_processing_failed
+                        )
+                    )
+                }
+
+                else -> Unit
+            }
+        }
+
         ProcessingUI(
             processingState = transactionProcessingState.value,
             titleSrc = R.string.entry_processed
-        ) {
-            viewModel.showToast(
-                context.getString(if (it) R.string.processing_done else R.string.export_processing_failed)
-            )
-        }
+        )
 
         Box(modifier = Modifier) {
             Row(modifier = Modifier
@@ -295,10 +309,20 @@ fun ViewAllTransactionUIComposable(
                                         viewModel.exportTransactions()
                                     }
                                 }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_export),
-                                    contentDescription = "export"
-                                )
+                                Row(
+                                    modifier = Modifier.padding(
+                                        horizontal = 16.dp,
+                                        vertical = 4.dp
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_export),
+                                        contentDescription = "export"
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(text = stringResource(id = R.string.export))
+                                }
                             }
                         }
                     }

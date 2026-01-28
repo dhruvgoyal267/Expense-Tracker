@@ -112,15 +112,43 @@ fun HomeScreenUi(
                 ProcessingState.Default
             )
 
-        ProcessingUI(smsProcessingState.value, R.string.sms_processed) {
-            viewModel.showToast(
-                context.getString(if (it) R.string.processing_done else R.string.sms_processing_failed))
+        LaunchedEffect(key1 = smsProcessingState) {
+            when (val state = smsProcessingState.value) {
+                is ProcessingState.Processed -> {
+                    viewModel.showToast(
+                        context.getString(
+                            if (state.isError.not())
+                                R.string.processing_done
+                            else
+                                R.string.sms_processing_failed
+                        )
+                    )
+                }
+
+                else -> Unit
+            }
         }
 
-        ProcessingUI(importProcessingState.value, R.string.entry_processed) {
-            viewModel.showToast(
-                context.getString(if (it) R.string.processing_done else R.string.import_processing_failed))
+        LaunchedEffect(key1 = importProcessingState) {
+            when (val state = importProcessingState.value) {
+                is ProcessingState.Processed -> {
+                    viewModel.showToast(
+                        context.getString(
+                            if (state.isError.not())
+                                R.string.processing_done
+                            else
+                                R.string.import_processing_failed
+                        )
+                    )
+                }
+
+                else -> Unit
+            }
         }
+
+        ProcessingUI(smsProcessingState.value, R.string.sms_processed)
+
+        ProcessingUI(importProcessingState.value, R.string.entry_processed)
 
         val appState by viewModel.appState.observeAsState(AppState.LOADING)
 
@@ -135,14 +163,24 @@ fun HomeScreenUi(
                 AppState.LOADING -> Loader()
 
                 AppState.NO_TRANSACTION_FOUND -> NoTransactionUI(viewModel = viewModel) {
-                    pickFileLauncher.launch(arrayOf("application/csv", "text/comma-separated-values"))
+                    pickFileLauncher.launch(
+                        arrayOf(
+                            "application/csv",
+                            "text/comma-separated-values"
+                        )
+                    )
                 }
 
                 AppState.TRANSACTION_FOUND -> TransactionLayoutUi(
                     viewModel = viewModel,
                     onViewMore = onViewMore,
                     importFile = {
-                        pickFileLauncher.launch(arrayOf("application/csv", "text/comma-separated-values"))
+                        pickFileLauncher.launch(
+                            arrayOf(
+                                "application/csv",
+                                "text/comma-separated-values"
+                            )
+                        )
                     }
                 )
             }

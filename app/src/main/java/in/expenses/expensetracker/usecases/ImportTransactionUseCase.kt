@@ -28,7 +28,7 @@ class ImportTransactionUseCaseImpl @Inject constructor(
                     val size = content.size
                     content.forEachIndexed { index, s ->
                         if (index > 0) {
-                            emit(ProcessingState.Processing(index + 1, size))
+                            emit(ProcessingState.Processing(index, size-1))
                             val data = s.split(",")
                             val amount = data[0].replace(",", "").replace("₹", "")
                             val date = "${data[2]}, ${data[3]}"
@@ -38,7 +38,7 @@ class ImportTransactionUseCaseImpl @Inject constructor(
                             addTransactionUseCase(amount, data[1], date)
                         }
                     }
-                    emit(ProcessingState.Processed(true))
+                    emit(ProcessingState.Processed(false))
                 } catch (e: Exception) {
                     e.printStackTrace()
                     emit(ProcessingState.Processed(true))

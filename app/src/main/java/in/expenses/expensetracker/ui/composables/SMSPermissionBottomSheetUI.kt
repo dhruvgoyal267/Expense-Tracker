@@ -1,5 +1,6 @@
 package `in`.expenses.expensetracker.ui.composables
 
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,7 +38,13 @@ fun SMSPermissionBottomSheetUI(viewModel: MainViewModel, sheetState: SheetState)
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.allow_us_to_take_the_sms_permission),
+                text = stringResource(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        R.string.allow_us_to_take_the_sms_and_notification_permission
+                    } else {
+                        R.string.allow_us_to_take_the_sms_permission
+                    }
+                ),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(id = R.color.title)

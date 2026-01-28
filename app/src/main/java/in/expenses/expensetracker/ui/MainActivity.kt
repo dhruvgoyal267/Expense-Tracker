@@ -1,7 +1,9 @@
 package `in`.expenses.expensetracker.ui
 
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
+import android.provider.Telephony
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -21,12 +23,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import `in`.expenses.expensetracker.R
+import `in`.expenses.expensetracker.broadcast.SmsBroadCastReceiver
 import `in`.expenses.expensetracker.model.NavScreens
 import `in`.expenses.expensetracker.model.TransactionSelector
+import `in`.expenses.expensetracker.ui.composables.AppRoot
 import `in`.expenses.expensetracker.ui.composables.HomeScreenUi
 import `in`.expenses.expensetracker.ui.composables.ViewAllTransactionsUI
 import `in`.expenses.expensetracker.ui.theme.ExpenseTrackerTheme
 import `in`.expenses.expensetracker.utils.AppConstants
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -37,54 +42,7 @@ class MainActivity : ComponentActivity() {
         checkForAmount(intent)
         setContent {
             ExpenseTrackerTheme {
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                val toastMsgState = viewModel.toastMsg.collectAsState()
-
-                LaunchedEffect(key1 = toastMsgState.value) {
-                    toastMsgState.value.takeIf { it.isNotBlank() }?.let {
-                        snackbarHostState.showSnackbar(it)
-                    }
-                }
-
-                Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(snackbarHostState)
-                    }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(it)
-                            .background(
-                                color = colorResource(id = R.color.app_bg)
-                            )
-                    ) {
-                        val navController = rememberNavController()
-                        NavHost(
-                            navController = navController,
-                            startDestination = NavScreens.HOME.name
-                        ) {
-                            composable(NavScreens.HOME.name) {
-                                HomeScreenUi(viewModel = viewModel) {
-                                    navController.navigate("${NavScreens.VIEW_ALL_TRANSACTION.name}/${it.key}")
-                                }
-                            }
-                            composable("${NavScreens.VIEW_ALL_TRANSACTION.name}/{selectedOption}") { backStackEntry ->
-                                val selectedOption =
-                                    backStackEntry.arguments?.getString("selectedOption")
-                                ViewAllTransactionsUI(
-                                    viewModel = viewModel,
-                                    selectedOption = TransactionSelector.getTransactionSelector(
-                                        selectedOption
-                                    )
-                                ) {
-                                    viewModel.stopListeningAllTransaction()
-                                    navController.popBackStack()
-                                }
-                            }
-                        }
-                    }
-                }
+                AppRoot(viewModel = viewModel)
             }
         }
     }
