@@ -70,11 +70,34 @@ fun getLastSixMonthTimeRange(): TimeRange {
 
 fun Double.formatAmount(): String {
     return when {
-        this >= 1_00_00_000 -> String.format("₹%.1fCr", this / 1_00_00_000.0)
-        this >= 1_00_000 -> String.format("₹%.1fL", this / 1_00_000.0)
-        this >= 1_000 -> String.format("₹%.1fK", this / 1_000.0)
+        this >= 1_00_00_000 -> String.format(Locale.getDefault(), "₹%.1fCr", this / 1_00_00_000.0)
+        this >= 1_00_000 -> String.format(Locale.getDefault(), "₹%.1fL", this / 1_00_000.0)
+        this >= 1_000 -> String.format(Locale.getDefault(), "₹%.1fK", this / 1_000.0)
         else -> "₹$this"
     }.replace(".0", "")
+}
+
+fun String.parseAmount(): Double? {
+    try {
+        val cleanString = this.replace("₹", "").trim()
+
+        return when {
+            cleanString.endsWith("Cr", ignoreCase = true) -> {
+                cleanString.dropLast(2).toDouble() * 1_00_00_000.0
+            }
+            cleanString.endsWith("L", ignoreCase = true) -> {
+                cleanString.dropLast(1).toDouble() * 1_00_000.0
+            }
+            cleanString.endsWith("K", ignoreCase = true) -> {
+                cleanString.dropLast(1).toDouble() * 1_000.0
+            }
+            else -> {
+                cleanString.toDouble()
+            }
+        }
+    } catch (e: Exception) {
+        return null
+    }
 }
 
 fun checkForEnableBtn(amount: String, spendOn: String): Boolean {

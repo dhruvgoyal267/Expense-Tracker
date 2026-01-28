@@ -116,22 +116,20 @@ fun ViewAllTransactionUIComposable(
 
         VerticalSpacer()
 
-        val transactionProcessingState =
-            viewModel.exportTransactionProcessingUIState.collectAsState(
-                ProcessingState.Default
-            )
+        val transactionProcessingState by viewModel.exportTransactionProcessingUIState.collectAsState()
 
         LaunchedEffect(key1 = transactionProcessingState) {
-            when (val state = transactionProcessingState.value) {
+            when (val state = transactionProcessingState) {
                 is ProcessingState.Processed -> {
                     viewModel.showToast(
                         context.getString(
-                            if (state.isError.not())
-                                R.string.processing_done
+                            if (state.isError)
+                                R.string.file_exported_error
                             else
-                                R.string.export_processing_failed
+                                R.string.the_file_has_been_successfully_exported_to_the_downloads_folder
                         )
                     )
+                    viewModel.resetExportProcessingState()
                 }
 
                 else -> Unit
@@ -139,7 +137,7 @@ fun ViewAllTransactionUIComposable(
         }
 
         ProcessingUI(
-            processingState = transactionProcessingState.value,
+            processingState = transactionProcessingState,
             titleSrc = R.string.entry_processed
         )
 
@@ -258,21 +256,9 @@ fun ViewAllTransactionUIComposable(
                         }
 
                         if (transactions.isNotEmpty()) {
-                            (transactionProcessingState.value as? ProcessingState.Processed)?.let { state ->
-                                viewModel.showToast(
-                                    stringResource(
-                                        if (state.isError) {
-                                            R.string.file_exported_error
-                                        } else {
-                                            R.string.the_file_has_been_successfully_exported_to_the_downloads_folder
-                                        }
-                                    )
-                                )
-                            }
-
                             val isBtnEnabled by remember {
                                 derivedStateOf {
-                                    when (val state = transactionProcessingState.value) {
+                                    when (val state = transactionProcessingState) {
                                         ProcessingState.Default -> true
                                         is ProcessingState.Processed -> state.isError.not()
                                         is ProcessingState.Processing -> false

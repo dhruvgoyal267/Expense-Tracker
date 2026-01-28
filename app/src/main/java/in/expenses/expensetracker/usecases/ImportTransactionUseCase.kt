@@ -5,6 +5,7 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import `in`.expenses.expensetracker.model.ProcessingState
 import `in`.expenses.expensetracker.utils.DispatcherProvider
+import `in`.expenses.expensetracker.utils.parseAmount
 import `in`.expenses.expensetracker.utils.toMillis
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -30,9 +31,9 @@ class ImportTransactionUseCaseImpl @Inject constructor(
                         if (index > 0) {
                             emit(ProcessingState.Processing(index, size-1))
                             val data = s.split(",")
-                            val amount = data[0].replace(",", "").replace("₹", "")
+                            val amount = data[0].parseAmount()?.toString()
                             val date = "${data[2]}, ${data[3]}"
-                            if (amount.toDoubleOrNull() == null || date.toMillis() == 0L) {
+                            if (amount == null || date.toMillis() == 0L) {
                                 throw Exception("Data format is not correct")
                             }
                             addTransactionUseCase(amount, data[1], date)

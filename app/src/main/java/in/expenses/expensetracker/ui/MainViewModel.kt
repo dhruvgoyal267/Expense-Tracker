@@ -277,6 +277,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun resetSmsProcessingState() {
+        _smsProcessingUIState.value = ProcessingState.Default
+    }
+
+    fun resetExportProcessingState() {
+        _exportTransactionProcessingUIState.value = ProcessingState.Default
+    }
+
+    fun resetImportProcessingState() {
+        _importTransactionProcessingUIState.value = ProcessingState.Default
+    }
+
     fun exportTransactions() {
         viewModelScope.launch {
             exportTransactionUseCase(transactions = _allTransactions.value.orEmpty()).collect {

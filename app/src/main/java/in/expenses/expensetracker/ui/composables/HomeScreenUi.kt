@@ -102,18 +102,12 @@ fun HomeScreenUi(
 
         VerticalSpacer(height = 16)
 
-        val smsProcessingState =
-            viewModel.smsProcessingState.collectAsState(
-                ProcessingState.Default
-            )
+        val smsProcessingState by viewModel.smsProcessingState.collectAsState()
 
-        val importProcessingState =
-            viewModel.importTransactionProcessingUIState.collectAsState(
-                ProcessingState.Default
-            )
+        val importProcessingState by viewModel.importTransactionProcessingUIState.collectAsState()
 
         LaunchedEffect(key1 = smsProcessingState) {
-            when (val state = smsProcessingState.value) {
+            when (val state = smsProcessingState) {
                 is ProcessingState.Processed -> {
                     viewModel.showToast(
                         context.getString(
@@ -123,6 +117,7 @@ fun HomeScreenUi(
                                 R.string.sms_processing_failed
                         )
                     )
+                    viewModel.resetSmsProcessingState()
                 }
 
                 else -> Unit
@@ -130,7 +125,7 @@ fun HomeScreenUi(
         }
 
         LaunchedEffect(key1 = importProcessingState) {
-            when (val state = importProcessingState.value) {
+            when (val state = importProcessingState) {
                 is ProcessingState.Processed -> {
                     viewModel.showToast(
                         context.getString(
@@ -140,15 +135,16 @@ fun HomeScreenUi(
                                 R.string.import_processing_failed
                         )
                     )
+                    viewModel.resetImportProcessingState()
                 }
 
                 else -> Unit
             }
         }
 
-        ProcessingUI(smsProcessingState.value, R.string.sms_processed)
+        ProcessingUI(smsProcessingState, R.string.sms_processed)
 
-        ProcessingUI(importProcessingState.value, R.string.entry_processed)
+        ProcessingUI(importProcessingState, R.string.entry_processed)
 
         val appState by viewModel.appState.observeAsState(AppState.LOADING)
 
